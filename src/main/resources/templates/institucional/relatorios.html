@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatórios — Fluxo Vital</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <th:block th:replace="~{fragments/layout :: css-global}"></th:block>
+
+  <style>
+    body { min-height: 100vh; }
+
+    .inst-wrapper { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; }
+    .inst-intro { text-align: center; margin-bottom: 3.5rem; }
+    .inst-title { font-size: 2.8rem; font-weight: 900; color: var(--text-dark); margin-bottom: 1rem; line-height: 1.15; letter-spacing: -1px; }
+    .inst-title .gradient-text { background: linear-gradient(135deg, var(--primary-red), var(--dark-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .inst-description { font-size: 1.1rem; color: var(--text-gray); max-width: 720px; margin: 0 auto; line-height: 1.8; }
+
+    .badge-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; padding: 0.65rem 1.6rem; border-radius: 50px;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 1.5rem; box-shadow: 0 8px 25px rgba(157,4,14,0.3);
+    }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+
+    .stat-card {
+      background: white; border-radius: 22px; padding: 2.2rem; text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+    }
+    .stat-card .stat-icon {
+      width: 64px; height: 64px; margin: 0 auto 1rem;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      border-radius: 18px; display: flex; align-items: center; justify-content: center;
+    }
+    .stat-card .stat-icon i { color: white; font-size: 1.7rem; }
+    .stat-card .stat-value { font-size: 2.2rem; font-weight: 900; color: var(--text-dark); line-height: 1; margin-bottom: 0.4rem; }
+    .stat-card .stat-label { color: var(--text-gray); font-size: 0.9rem; font-weight: 600; }
+
+    /* ========== RESUMO DO DOADOR (logado) ========== */
+    .resumo-card {
+      background: white; border-radius: 28px; padding: 2.4rem 2.2rem;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.14); margin-bottom: 3.5rem;
+    }
+    .resumo-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.8rem; }
+    .resumo-header h2 { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); margin: 0; }
+    .resumo-header h2 span { color: var(--primary-red); }
+    .btn-resumo-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; padding: 0.65rem 1.4rem; border-radius: 50px;
+      font-weight: 700; font-size: 0.88rem; text-decoration: none; transition: all 0.3s ease;
+      box-shadow: 0 8px 22px rgba(157,4,14,0.28);
+    }
+    .btn-resumo-cta:hover { transform: translateY(-2px); color: white; box-shadow: 0 12px 30px rgba(157,4,14,0.4); }
+
+    .resumo-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 1.8rem; }
+    .resumo-stat { background: var(--light-pink); border-radius: 18px; padding: 1.2rem 1rem; text-align: center; }
+    .resumo-stat .valor { font-size: 1.8rem; font-weight: 900; color: var(--text-dark); line-height: 1; }
+    .resumo-stat .rotulo { font-size: 0.78rem; color: var(--text-gray); font-weight: 600; margin-top: 0.35rem; }
+    .resumo-stat.stat-pendentes .valor { color: #b8860b; }
+    .resumo-stat.stat-confirmados .valor { color: #1a5276; }
+    .resumo-stat.stat-realizados .valor { color: #1e8449; }
+
+    .resumo-lista { border-top: 1px solid #eee; padding-top: 1.4rem; }
+    .resumo-item {
+      display: flex; align-items: center; gap: 0.9rem; padding: 0.75rem 0;
+      border-bottom: 1px solid #f4f4f4;
+    }
+    .resumo-item:last-child { border-bottom: none; }
+    .resumo-item .item-icon {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      background: rgba(157,4,14,0.08); color: var(--primary-red);
+      display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+    }
+    .resumo-item .item-info { flex: 1; min-width: 0; }
+    .resumo-item .item-tipo { font-weight: 700; font-size: 0.92rem; color: var(--text-dark); }
+    .resumo-item .item-detalhe { font-size: 0.8rem; color: var(--text-gray); }
+    .badge-status {
+      font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 50px;
+      text-transform: capitalize; white-space: nowrap;
+    }
+    .badge-pendente   { background: #fff3cd; color: #8a6d00; }
+    .badge-confirmado { background: #d6e9f8; color: #1a5276; }
+    .badge-realizado  { background: #d4edda; color: #1e8449; }
+    .badge-cancelado  { background: #f8d7da; color: #a12622; }
+
+    .resumo-vazio { text-align: center; padding: 1rem 0; color: var(--text-gray); font-size: 0.92rem; }
+
+    @media (max-width: 700px) {
+      .resumo-stats { grid-template-columns: repeat(2, 1fr); }
+      .resumo-card { padding: 1.8rem 1.4rem; }
+    }
+
+    .inst-note {
+      background: linear-gradient(135deg, rgba(157,4,14,0.06), rgba(157,4,14,0.03));
+      border-left: 4px solid var(--primary-red);
+      border-radius: 14px; padding: 1.2rem 1.6rem;
+      color: var(--text-gray); font-size: 0.92rem; line-height: 1.7;
+      display: flex; gap: 0.8rem; align-items: flex-start;
+    }
+    .inst-note i { color: var(--primary-red); font-size: 1.1rem; margin-top: 0.15rem; }
+
+    @media (max-width: 768px) {
+      .inst-wrapper { padding: 3rem 1rem; }
+      .inst-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div th:replace="~{fragments/layout :: navbar}"></div>
+
+  <main class="inst-wrapper">
+
+    <section class="inst-intro">
+      <div class="badge-label"><i class="fa-solid fa-chart-line"></i><span>Impacto</span></div>
+      <h1 class="inst-title">Nossos <span class="gradient-text">Relatórios</span></h1>
+      <p class="inst-description">
+        Acompanhe números e estatísticas sobre as doações realizadas através do Fluxo Vital.
+      </p>
+    </section>
+
+    <!-- RESUMO PESSOAL DO DOADOR LOGADO -->
+    <div class="resumo-card" th:if="${doadorLogado}">
+      <div class="resumo-header">
+        <h2>Olá, <span th:text="${doadorNome}">Doador</span> — este é o seu resumo</h2>
+        <a th:href="@{/doador/home}" class="btn-resumo-cta">
+          <i class="bi bi-clipboard2-pulse"></i> Ver todos os agendamentos
+        </a>
+      </div>
+
+      <div class="resumo-stats">
+        <div class="resumo-stat">
+          <div class="valor" th:text="${resumoTotal}">0</div>
+          <div class="rotulo">Total enviados</div>
+        </div>
+        <div class="resumo-stat stat-pendentes">
+          <div class="valor" th:text="${resumoPendentes}">0</div>
+          <div class="rotulo">Pendentes</div>
+        </div>
+        <div class="resumo-stat stat-confirmados">
+          <div class="valor" th:text="${resumoConfirmados}">0</div>
+          <div class="rotulo">Confirmados</div>
+        </div>
+        <div class="resumo-stat stat-realizados">
+          <div class="valor" th:text="${resumoRealizados}">0</div>
+          <div class="rotulo">Realizados</div>
+        </div>
+      </div>
+
+      <div class="resumo-lista">
+        <div th:if="${resumoRecentes == null or resumoRecentes.isEmpty()}" class="resumo-vazio">
+          <i class="bi bi-info-circle me-1"></i> Você ainda não enviou nenhum formulário de doação.
+          <a th:href="@{/doador/home}">Comece agora</a>.
+        </div>
+        <div th:each="item : ${resumoRecentes}" class="resumo-item">
+          <div class="item-icon"><i class="bi" th:classappend="${item.icone}"></i></div>
+          <div class="item-info">
+            <div class="item-tipo" th:text="${item.tipo}">Sangue</div>
+            <div class="item-detalhe">
+              <span th:text="${item.unidade != null ? item.unidade : 'Unidade não informada'}">Unidade</span>
+              <span th:if="${item.data != null}"> &middot; <span th:text="${#temporals.format(item.data,'dd/MM/yyyy')}">01/01/2026</span></span>
+            </div>
+          </div>
+          <span class="badge-status" th:classappend="'badge-' + ${item.status}" th:text="${item.status}">status</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-droplet"></i></div>
+        <div class="stat-value" th:text="${totalSangue}">0</div>
+        <div class="stat-label">Formulários de Sangue</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-bone"></i></div>
+        <div class="stat-value" th:text="${totalMedula}">0</div>
+        <div class="stat-label">Cadastros de Medula</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-baby"></i></div>
+        <div class="stat-value" th:text="${totalLeite}">0</div>
+        <div class="stat-label">Doações de Leite</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-hospital"></i></div>
+        <div class="stat-value" th:text="${totalInstituicoes}">0</div>
+        <div class="stat-label">Instituições Parceiras</div>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: 1fr; max-width: 420px; margin: 0 auto 3rem;">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-value" th:text="${totalRealizadas}">0</div>
+        <div class="stat-label">Doações efetivamente realizadas</div>
+      </div>
+    </div>
+
+    <div class="inst-note">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>
+        Números atualizados em tempo real, com base nos formulários enviados por doadores e nas
+        instituições cadastradas na plataforma Fluxo Vital. Os valores de "realizadas" refletem apenas
+        agendamentos já concluídos e confirmados pela instituição.
+      </span>
+    </div>
+
+  </main>
+
+  <div th:replace="~{fragments/layout :: footer}"></div>
+
+  <script>
+    window.addEventListener('scroll', function () {
+      document.querySelector('.navbar-premium').classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>

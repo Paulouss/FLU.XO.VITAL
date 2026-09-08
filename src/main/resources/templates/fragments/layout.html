@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<!-- ============================================================
+     FRAGMENTO: NAVBAR
+     Uso: th:replace="~{fragments/layout :: navbar}"
+     ============================================================ -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-premium">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <img th:src="@{/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'" />
+      <div class="logo-text">
+        <span class="logo-main">Fluxo Vital</span>
+        <span class="logo-sub">Salvando Vidas</span>
+      </div>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Abrir menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav align-items-lg-center gap-lg-1">
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-heart-pulse me-1"></i>Doações
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" th:href="@{/doador/login}">
+                <i class="fa-solid fa-droplet"></i>Doação de Sangue
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" th:href="@{/doador/login}">
+                <i class="fa-solid fa-bone"></i>Doação de Médula Óssea
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" th:href="@{/doador/login}">
+                <i class="fa-solid fa-baby"></i>Doação de Leite Materno
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/campanhas}">
+            <i class="bi bi-megaphone me-1"></i>Campanhas
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/relatorios}">
+            <i class="bi bi-file-earmark-bar-graph me-1"></i>Relatórios
+          </a>
+        </li>
+
+      </ul>
+
+      <!-- Grupo separado dos links de navegação, empurrado pro extremo direito (a partir do breakpoint lg) -->
+      <div class="d-flex flex-column flex-lg-row ms-lg-auto align-items-stretch align-items-lg-center gap-2 mt-2 mt-lg-0" style="margin-right: -1rem;">
+
+        <!-- Doador autenticado -->
+        <th:block th:if="${session.doador_id != null}">
+          <a th:href="@{/doador/home}" class="btn-login-premium">
+            <i class="bi bi-person-heart"></i>
+            <span>Olá, <span th:text="${session.doador_nome_exibicao}">Doador</span></span>
+          </a>
+          <a th:href="@{/doador/logout}" class="btn-login-outline">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Sair</span>
+          </a>
+        </th:block>
+
+        <!-- Instituição autenticada -->
+        <th:block th:if="${session.doador_id == null and session.instituicao_id != null}">
+          <a th:href="@{/instituicao/home}" class="btn-login-premium">
+            <i class="bi bi-building-fill-check"></i>
+            <span th:text="${session.instituicao_nome}">Instituição</span>
+          </a>
+          <a th:href="@{/instituicao/logout}" class="btn-login-outline">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Sair</span>
+          </a>
+        </th:block>
+
+        <!-- Visitante (ninguém autenticado) -->
+        <th:block th:if="${session.doador_id == null and session.instituicao_id == null}">
+          <a th:href="@{/doador/login}" class="btn-login-premium">
+            <i class="bi bi-person-heart"></i>
+            <span>Sou Doador</span>
+          </a>
+          <a th:href="@{/instituicao/categoria}" class="btn-login-premium">
+            <i class="bi bi-building-heart"></i>
+            <span>Sou Instituição</span>
+          </a>
+        </th:block>
+
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     FRAGMENTO: NAVBAR SIMPLES (sem dropdown de doações)
+     ============================================================ -->
+<nav th:fragment="navbar-simples" class="navbar navbar-expand-lg navbar-premium">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <img th:src="@{/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'" />
+      <div class="logo-text">
+        <span class="logo-main">Fluxo Vital</span>
+        <span class="logo-sub">Salvando Vidas</span>
+      </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-expanded="false" aria-label="Abrir menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/}"><i class="bi bi-house me-1"></i>Início</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/sobre}"><i class="bi bi-megaphone me-1"></i>Sobre</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/contato}"><i class="bi bi-envelope me-1"></i>Contato</a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a th:href="@{/cadastro/tipos}" class="btn-login-premium mt-2 mt-lg-0">
+            <i class="bi bi-box-arrow-in-right"></i><span>Entrar</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     FRAGMENTO: NAVBAR DOADOR (Início / Sobre / Processo / FAQ / Quero Doar)
+     Uso: th:replace="~{fragments/layout :: navbar-doador}"
+     ============================================================ -->
+<nav th:fragment="navbar-doador" class="navbar navbar-expand-lg navbar-premium">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <img th:src="@{/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'" />
+      <div class="logo-text">
+        <span class="logo-main">Fluxo Vital</span>
+        <span class="logo-sub">Salvando Vidas</span>
+      </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Abrir menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/}"><i class="bi bi-house me-1"></i>Início</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/sobre}"><i class="bi bi-megaphone me-1"></i>Sobre</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/processo}"><i class="bi bi-diagram-3 me-1"></i>Processo</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/faq}"><i class="bi bi-question-circle me-1"></i>FAQ</a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a th:href="@{/cadastro/tipos}" class="btn-login-premium mt-2 mt-lg-0">
+            <i class="bi bi-heart-pulse-fill"></i><span>Quero Doar</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     FRAGMENTO: FOOTER
+     ============================================================ -->
+<footer th:fragment="footer" class="footer-luxury">
+  <div class="footer-container">
+    <div class="footer-columns">
+
+      <div class="footer-column">
+        <h5>Sistema Fluxo Vital</h5>
+        <p class="footer-text">
+          Um sistema de integrações entre usuários, doadores e instituições que auxilia no agendamento e
+          arquivação de doações, tornando o processo mais eficiente e acessível para todos.
+        </p>
+        <p class="footer-text">
+          Expandindo gradativamente através da integração com instituições na capital do Maranhão,
+          contemplando toda a população e potencializando o fluxo de doações.
+        </p>
+        <div class="footer-info">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>Universidade CEUMA - Campus Renascença - São Luís - MA</span>
+        </div>
+        <div class="footer-info">
+          <i class="bi bi-telephone-fill"></i>
+          <span>(98) 98467-4013</span>
+        </div>
+        <div class="footer-info">
+          <i class="bi bi-envelope-fill"></i>
+          <span>contato@fluxovital.com.org</span>
+        </div>
+      </div>
+
+      <div class="footer-column">
+        <h5>Navegação</h5>
+        <ul class="footer-menu">
+          <li><a href="#">Institucional</a></li>
+          <li><a href="#">Legislação</a></li>
+          <li><a href="#">Unidades</a></li>
+          <li><a href="#">Campanhas</a></li>
+          <li><a href="#">Requisitos</a></li>
+          <li><a href="#">Ouvidoria</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h5>Entre em Contato</h5>
+        <div class="contact-form-box">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-input" placeholder="Seu nome completo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-input" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input type="tel" class="form-input" placeholder="(98) 98765-4321">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mensagem</label>
+            <textarea class="form-input" rows="3" placeholder="Escreva sua mensagem aqui..."></textarea>
+          </div>
+          <button type="button" class="btn-submit">Enviar Mensagem</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-end">
+      © 2025 <strong>Fluxo Vital</strong> — Todos os direitos reservados | P.I - GPECOV
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     FRAGMENTO: CSS GLOBAL (navbar + footer compartilhados)
+     ============================================================ -->
+<th:block th:fragment="css-global">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    :root {
+      --primary-red: #9d040e;
+      --dark-red: #7B1B1B;
+      --deep-red: #6B0000;
+      --light-pink: #FFF5F7;
+      --cream: #FFFBF7;
+      --text-dark: #1A1A1A;
+      --text-gray: #6B7280;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--light-pink) 100%);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ========== NAVBAR ========== */
+    .navbar-premium {
+      background: linear-gradient(135deg, #9d040e 0%, #7B1B1B 100%);
+      padding: 1rem 0;
+      box-shadow: 0 10px 40px rgba(157, 4, 14, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 4px solid #9d040e;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: slideDown 0.6s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-100%); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .navbar-premium.scrolled { padding: 0.7rem 0; box-shadow: 0 8px 30px rgba(157, 4, 14, 0.5); }
+
+    .navbar-premium .navbar-brand {
+      color: white !important;
+      font-weight: 900;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      animation: fadeInLeft 0.6s ease 0.2s both;
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .navbar-premium .navbar-brand:hover {
+      transform: translateX(5px) scale(1.03);
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.4));
+    }
+
+    .navbar-premium .navbar-brand img {
+      height: 50px; width: auto;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+      transition: all 0.4s ease;
+    }
+
+    .navbar-premium .navbar-brand:hover img { transform: scale(1.08); }
+
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-main { font-size: 1.4rem; font-weight: 800; color: #fff; }
+    .logo-sub  { font-size: 0.7rem; color: #ffccd0; letter-spacing: 0.08em; font-weight: 400; }
+
+    .navbar-premium .nav-link {
+      color: rgba(255,255,255,0.95) !important;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.7rem 1.2rem !important;
+      margin: 0 0.1rem;
+      border-radius: 6px;
+      transition: color 0.2s ease;
+      position: relative;
+    }
+
+    .navbar-premium .nav-link::before { display: none; }
+
+    .navbar-premium .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 1.2rem; right: 1.2rem;
+      height: 2px;
+      background: white;
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+    }
+
+    .navbar-premium .nav-link:hover { color: white !important; }
+    .navbar-premium .nav-link:hover::after { transform: scaleX(1); }
+
+    .navbar-premium .nav-item { animation: fadeInDown 0.5s ease both; }
+    .navbar-premium .nav-item:nth-child(1) { animation-delay: 0.2s; }
+    .navbar-premium .nav-item:nth-child(2) { animation-delay: 0.3s; }
+    .navbar-premium .nav-item:nth-child(3) { animation-delay: 0.4s; }
+    .navbar-premium .nav-item:nth-child(4) { animation-delay: 0.5s; }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .navbar-premium .dropdown-menu {
+      background: linear-gradient(135deg, #7B1B1B 0%, #6B0000 100%);
+      border: none;
+      border-radius: 20px;
+      padding: 1rem;
+      margin-top: 0.8rem;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+      animation: fadeInDown 0.25s ease;
+      min-width: 240px;
+    }
+
+    .navbar-premium .dropdown-item {
+      color: white;
+      padding: 0.9rem 1.3rem;
+      border-radius: 12px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-premium .dropdown-item:last-child { margin-bottom: 0; }
+
+    .navbar-premium .dropdown-item:hover {
+      background: rgba(255,255,255,0.18);
+      color: white;
+      transform: translateX(8px);
+      padding-left: 1.6rem;
+    }
+
+    .navbar-premium .dropdown-item i { font-size: 1rem; min-width: 18px; }
+
+    .btn-login-premium {
+      background: white;
+      color: #c90101 !important;
+      padding: 0.7rem 1.8rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 3px solid white;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 5px 20px rgba(255,255,255,0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-login-outline {
+      background: transparent;
+      color: white !important;
+      padding: 0.7rem 1.6rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 3px solid rgba(255,255,255,0.55);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-login-outline:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: white;
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .navbar-toggler {
+      border: 2px solid rgba(255,255,255,0.8);
+      padding: 0.45rem 0.7rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-toggler:focus { box-shadow: none; }
+    .navbar-toggler:hover { transform: scale(1.08); border-color: white; }
+    .navbar-toggler-icon { filter: brightness(0) invert(1); }
+
+    @media (max-width: 991px) {
+      .navbar-premium .navbar-collapse {
+        background: #7B1B1B;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-top: 0.8rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      }
+      .navbar-premium .nav-link { padding: 0.7rem 1rem !important; margin: 0.2rem 0; border-radius: 10px; }
+      .navbar-premium .dropdown-menu {
+        background: rgba(107,0,0,0.6);
+        border-radius: 12px;
+        margin-top: 0.3rem;
+        box-shadow: none;
+        padding: 0.5rem;
+      }
+      .btn-login-premium, .btn-login-outline { width: 100%; justify-content: center; margin-top: 0.5rem; }
+    }
+
+    /* ========== FOOTER ========== */
+    .footer-luxury {
+      background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 50%, #0D0D0D 100%);
+      color: #E0E0E0;
+      padding: 5rem 0 2rem;
+      position: relative;
+      overflow: hidden;
+      margin-top: 4rem;
+    }
+
+    .footer-luxury::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: var(--primary-red);
+    }
+
+    .footer-luxury::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(157,4,14,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(157,4,14,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .footer-container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+
+    .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 3.5rem; margin-bottom: 4rem; }
+
+    .footer-column h5 {
+      font-size: 1.3rem; font-weight: 800; color: white;
+      margin-bottom: 1.8rem; position: relative; padding-bottom: 1rem;
+    }
+
+    .footer-column h5::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 55px; height: 4px; background: var(--primary-red); border-radius: 2px;
+    }
+
+    .footer-text { line-height: 1.9; color: #B8B8B8; margin-bottom: 1.5rem; font-size: 0.93rem; }
+
+    .footer-info { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 1.1rem; color: #B8B8B8; transition: all 0.3s ease; }
+    .footer-info:hover { color: var(--primary-red); transform: translateX(6px); }
+    .footer-info i { width: 26px; color: var(--primary-red); font-size: 1.1rem; margin-top: 3px; }
+
+    .footer-menu { list-style: none; padding: 0; }
+    .footer-menu li { margin-bottom: 0.9rem; }
+    .footer-menu a { color: #B8B8B8; text-decoration: none; transition: all 0.3s ease; display: inline-block; position: relative; font-weight: 500; font-size: 0.95rem; }
+    .footer-menu a::before { content: '▸'; position: absolute; left: -22px; opacity: 0; transition: all 0.3s ease; color: var(--primary-red); }
+    .footer-menu a:hover { color: var(--primary-red); padding-left: 22px; }
+    .footer-menu a:hover::before { opacity: 1; left: 0; }
+
+    .contact-form-box { background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 18px; border: 2px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); }
+    .form-group { margin-bottom: 1.3rem; }
+    .form-label { color: white; font-weight: 600; margin-bottom: 0.5rem; display: block; font-size: 0.9rem; }
+    .form-input { width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15); border-radius: 10px; color: white; transition: all 0.3s ease; font-size: 0.93rem; font-family: 'Inter', sans-serif; }
+    .form-input:focus { outline: none; background: rgba(255,255,255,0.12); border-color: var(--primary-red); box-shadow: 0 0 0 3px rgba(157,4,14,0.2); }
+    .form-input::placeholder { color: rgba(255,255,255,0.38); }
+    .btn-submit { width: 100%; padding: 1.1rem; background: linear-gradient(135deg, var(--primary-red), var(--dark-red)); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(157,4,14,0.38); font-family: 'Inter', sans-serif; }
+    .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(157,4,14,0.5); }
+
+    .footer-end { text-align: center; padding-top: 2.5rem; border-top: 1px solid rgba(255,255,255,0.1); color: #909090; font-size: 0.92rem; }
+    .footer-end strong { color: var(--primary-red); font-weight: 700; }
+  </style>
+</th:block>
+
+</html>

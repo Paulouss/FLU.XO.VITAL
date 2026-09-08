@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agendamento de Doação de Sangue | Fluxo Vital</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+    <link rel="shortcut icon" th:href="@{/assets/images/logo_fluxovital.png}" type="image/x-icon" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red:       #9d040e;
+            --red-dark:  #7a030b;
+            --red-bg:    #fdf0f0;
+            --red-border:rgba(157,4,14,0.18);
+            --text:      #1a1a1a;
+            --muted:     #6b7280;
+            --border:    #e5e7eb;
+            --bg:        #ffffff;
+            --surface:   #f9fafb;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar-premium {
+            background: linear-gradient(135deg, #9d040e 0%, #7B1B1B 100%);
+            padding: 1rem 0;
+            box-shadow: 0 10px 40px rgba(157, 4, 14, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 4px solid #9d040e;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-100%); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar-premium.scrolled {
+            padding: 0.7rem 0;
+            box-shadow: 0 8px 30px rgba(157, 4, 14, 0.5);
+        }
+
+        .navbar-premium .navbar-brand {
+            color: white !important;
+            font-weight: 900;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            animation: fadeInLeft 0.6s ease 0.2s both;
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .navbar-premium .navbar-brand:hover {
+            transform: translateX(5px) scale(1.03);
+        }
+
+        .navbar-premium .navbar-brand img {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+            transition: all 0.4s ease;
+        }
+
+        .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+        .logo-main { font-size: 1.4rem; font-weight: 800; color: #fff; }
+        .logo-sub  { font-size: 0.7rem; color: #ffccd0; letter-spacing: 0.08em; font-weight: 400; }
+
+        .navbar-premium .nav-link {
+            color: rgba(255,255,255,0.95) !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.2rem !important;
+            margin: 0 0.1rem;
+            border-radius: 6px;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .navbar-premium .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 1.2rem;
+            right: 1.2rem;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s ease;
+        }
+
+        .navbar-premium .nav-link:hover { color: white !important; }
+        .navbar-premium .nav-link:hover::after { transform: scaleX(1); }
+
+        .btn-login-premium {
+            background: white;
+            color: #c90101 !important;
+            padding: 0.7rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 3px solid white;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 5px 20px rgba(255,255,255,0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-login-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(255,255,255,0.35);
+        }
+
+        .navbar-toggler {
+            border: 2px solid rgba(255,255,255,0.8);
+            padding: 0.45rem 0.7rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-toggler:focus { box-shadow: none; }
+        .navbar-toggler:hover { transform: scale(1.08); border-color: white; }
+        .navbar-toggler-icon { filter: brightness(0) invert(1); }
+
+        @media (max-width: 991px) {
+            .navbar-premium .navbar-collapse {
+                background: #7B1B1B;
+                border-radius: 16px;
+                padding: 1rem;
+                margin-top: 0.8rem;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            }
+            .navbar-premium .nav-link {
+                padding: 0.7rem 1rem !important;
+                margin: 0.2rem 0;
+                border-radius: 10px;
+            }
+            .btn-login-premium {
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* ── PAGE HERO BANNER ── */
+        .page-hero {
+            background: linear-gradient(135deg, #fff5f5 0%, #fdf0f0 100%);
+            border-bottom: 1px solid var(--red-border);
+            padding: 1.6rem 0 1.2rem;
+            text-align: center;
+        }
+
+        .page-hero .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--red-bg);
+            border: 1px solid var(--red-border);
+            color: var(--red);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 50px;
+            margin-bottom: 0.7rem;
+        }
+
+        .page-hero h1 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+
+        .page-hero p {
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        main {
+            flex: 1;
+            display: flex;
+            gap: 2rem;
+            max-width: 1040px;
+            width: 100%;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+            align-items: flex-start;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 90px;
+        }
+
+        .sidebar-steps { list-style: none; display: flex; flex-direction: column; gap: 0; }
+
+        .step-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 28px;
+            bottom: 0;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .step-item.done::after { background: var(--red); }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--muted);
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .step-item.active .step-num {
+            border-color: var(--red);
+            background: var(--red);
+            color: white;
+        }
+
+        .step-item.done .step-num {
+            border-color: var(--red);
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .step-info { padding-top: 4px; }
+        .step-title { font-size: 0.82rem; font-weight: 500; color: var(--text); }
+        .step-desc  { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+        .step-item.active .step-title { color: var(--red); }
+
+        .sidebar-note {
+            margin-top: 2rem;
+            padding: 12px 14px;
+            background: var(--red-bg);
+            border: 0.5px solid var(--red-border);
+            border-radius: 10px;
+        }
+
+        .sidebar-note p {
+            font-size: 0.75rem;
+            color: var(--red);
+            line-height: 1.65;
+        }
+
+        .sidebar-tip {
+            margin-top: 1rem;
+            padding: 12px 14px;
+            background: #fff8e1;
+            border: 0.5px solid rgba(180,140,0,0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-tip p {
+            font-size: 0.75rem;
+            color: #7a5c00;
+            line-height: 1.65;
+        }
+
+        /* ── CARD ── */
+        .card {
+            flex: 1;
+            background: var(--bg);
+            border: 0.5px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+        }
+
+        /* ── ALERTAS ── */
+        .alert {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 1.8rem;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 0.5px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        .alert-blood {
+            background: var(--red-bg);
+            border: 0.5px solid var(--red-border);
+            color: #7a030b;
+        }
+
+        .alert-danger {
+            background: var(--red-bg);
+            border: 0.5px solid var(--red-border);
+            color: var(--red);
+        }
+
+        .alert svg { flex-shrink: 0; margin-top: 2px; }
+
+        /* ── SEÇÕES ── */
+        .section { margin-bottom: 2rem; }
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding-bottom: 0.75rem;
+            border-bottom: 0.5px solid var(--border);
+            margin-bottom: 1.2rem;
+        }
+
+        /* ── GRID ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.1rem; }
+        .col-full { grid-column: 1 / -1; }
+
+        /* ── CAMPOS ── */
+        .field { display: flex; flex-direction: column; gap: 5px; }
+
+        label.field-label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .req { color: var(--red); margin-left: 2px; }
+
+        .field-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 0.5px solid var(--border);
+            border-radius: 9px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: border 0.15s, box-shadow 0.15s;
+            -webkit-appearance: none;
+        }
+
+        .field-input:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(157,4,14,0.08);
+        }
+
+        .field-input::placeholder { color: #b0b7c3; }
+
+        select.field-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        textarea.field-input { resize: vertical; min-height: 90px; }
+
+        .field-hint {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .field-error {
+            font-size: 0.72rem;
+            color: var(--red);
+            margin-top: 2px;
+            display: none;
+        }
+
+        .field-input.is-invalid { border-color: var(--red); }
+        .field-input.is-invalid ~ .field-error { display: block; }
+
+        /* ── FEEDBACK EM TEMPO REAL (CPF / RG) ── */
+        .field-feedback {
+            font-size: 0.72rem;
+            margin-top: 3px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .field-feedback.show { display: flex; }
+        .field-feedback.checking { color: var(--muted); }
+        .field-feedback.ok       { color: #059669; }
+        .field-feedback.warn     { color: var(--red); }
+
+        /* ── RADIO / CHECKBOX ── */
+        .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .radio-opt {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border: 0.5px solid var(--border);
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .radio-opt input { accent-color: var(--red); }
+        .radio-opt:hover { border-color: var(--red); background: var(--red-bg); }
+
+        .check-group { display: flex; flex-direction: column; gap: 8px; }
+
+        .check-opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 0.5px solid var(--border);
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+            user-select: none;
+            line-height: 1.5;
+        }
+
+        .check-opt input { accent-color: var(--red); width: 15px; height: 15px; flex-shrink: 0; }
+        .check-opt:hover { border-color: #d1d5db; background: var(--surface); }
+
+        /* ── INABILITAÇÃO DESTACADA ── */
+        .inab-box {
+            background: var(--red-bg);
+            border: 0.5px solid var(--red-border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 0.8rem;
+        }
+
+        .inab-box .inab-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* ── DIVIDER ── */
+        .divider { height: 0.5px; background: var(--border); margin: 1.8rem 0; }
+
+        /* ── FORM FOOTER ── */
+        .form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1.5rem;
+            border-top: 0.5px solid var(--border);
+            margin-top: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .btn-submit {
+            padding: 11px 30px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.1px;
+        }
+
+        .btn-submit:hover { background: var(--red-dark); transform: translateY(-1px); }
+        .btn-submit:active { transform: scale(0.98); }
+
+        /* ── SITE FOOTER ── */
+        .site-footer {
+            background: var(--bg);
+            border-top: 0.5px solid var(--border);
+            text-align: center;
+            padding: 1.2rem;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        /* ── RESPONSIVO ── */
+        @media (max-width: 820px) {
+            main { flex-direction: column; }
+            .sidebar { width: 100%; position: static; }
+            .sidebar-steps { flex-direction: row; gap: 0; overflow-x: auto; }
+            .step-item { flex-direction: column; align-items: center; text-align: center; padding-bottom: 0; padding-right: 1.5rem; }
+            .step-item:not(:last-child)::after { top: 14px; left: 28px; right: 0; bottom: auto; width: auto; height: 1px; }
+            .step-info { padding-top: 6px; }
+        }
+
+        @media (max-width: 600px) {
+            .card { padding: 1.5rem 1.2rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar navbar-expand-lg navbar-premium">
+    <div class="container">
+
+        <a class="navbar-brand" th:href="@{/doador/home}">
+            <img th:src="@{/assets/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'" />
+            <div class="logo-text">
+                <span class="logo-main">Fluxo Vital</span>
+                <span class="logo-sub">Salvando Vidas</span>
+            </div>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/doador/home}">
+                        <i class="bi bi-house me-1"></i>Início
+                    </a>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <a class="btn-login-premium" th:href="@{/doador/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Sair
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+<!-- ── BANNER DA PÁGINA ── -->
+<div class="page-hero">
+    <div class="hero-badge">
+        <i class="bi bi-droplet-fill"></i>
+        Doação de Sangue
+    </div>
+    <h1>Agendamento de Doação de Sangue</h1>
+    <p>Uma doação pode salvar até 4 vidas. Preencha o formulário e agende sua doação.</p>
+</div>
+
+<!-- ── MAIN ── -->
+<main>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <ul class="sidebar-steps">
+            <li class="step-item done">
+                <div class="step-num">✓</div>
+                <div class="step-info">
+                    <div class="step-title">Identificação</div>
+                    <div class="step-desc">Dados pessoais</div>
+                </div>
+            </li>
+            <li class="step-item active">
+                <div class="step-num">2</div>
+                <div class="step-info">
+                    <div class="step-title">Agendamento</div>
+                    <div class="step-desc">Data e unidade</div>
+                </div>
+            </li>
+        </ul>
+
+        <div class="sidebar-note">
+            <p>Toda informação é sigilosa e utilizada exclusivamente para fins médicos, conforme a legislação vigente.</p>
+        </div>
+
+        <div class="sidebar-tip">
+            <p><strong>💡 Sabia que?</strong> 1 doação de sangue (450 ml) pode salvar até 4 pacientes. O seu corpo repõe o volume em poucas horas.</p>
+        </div>
+    </aside>
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+
+        <div class="alert alert-blood">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Para doar sangue, é necessário ter entre <strong>16 e 69 anos</strong>, pesar no mínimo <strong>50 kg</strong> e estar em boas condições de saúde. Menores de 18 anos precisam de autorização dos responsáveis.</span>
+        </div>
+
+        <!-- Mensagens de sucesso/erro do servidor -->
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+        <div th:if="${sucesso}" class="alert" style="background:#d1fae5;border:0.5px solid #6ee7b7;color:#065f46;" th:text="${sucesso}"></div>
+
+        <form th:action="@{/doador/sangue/form}" method="POST" novalidate autocomplete="off" id="main-form">
+
+            <!-- ── IDENTIFICAÇÃO ── -->
+            <div class="section">
+                <div class="section-title">Identificação</div>
+                <div class="grid-2">
+
+                    <div class="field col-full">
+                        <label class="field-label" for="nome">Nome completo <span class="req">*</span></label>
+                        <input class="field-input" type="text" id="nome" name="nome"
+                               th:value="${doadorNome}" placeholder="Como consta no documento oficial" required />
+                        <span class="field-error">Campo obrigatório.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="cpf">CPF <span class="req">*</span></label>
+                        <input class="field-input" type="text" id="cpf" name="cpf"
+                               placeholder="000.000.000-00" maxlength="14" required />
+                        <span class="field-feedback" id="cpf-feedback"></span>
+                        <span class="field-error">CPF inválido.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="rg">RG</label>
+                        <input class="field-input" type="text" id="rg" name="rg" placeholder="Somente números, 12 dígitos" maxlength="12" inputmode="numeric" pattern="[0-9]{12}" />
+                        <span class="field-feedback" id="rg-feedback"></span>
+                        <span class="field-error">RG deve ter exatamente 12 números.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="nascimento">Data de nascimento <span class="req">*</span></label>
+                        <input class="field-input" type="date" id="nascimento" name="nascimento" required />
+                        <span class="field-hint">O doador deve ter entre 16 e 69 anos.</span>
+                        <span class="field-error">Data inválida ou fora do limite de idade.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="email">E-mail <span class="req">*</span></label>
+                        <input class="field-input" type="email" id="email" name="email"
+                               placeholder="seu@email.com" required />
+                        <span class="field-error">E-mail inválido.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="telefone">Telefone / WhatsApp <span class="req">*</span></label>
+                        <input class="field-input" type="tel" id="telefone" name="telefone"
+                               placeholder="(00) 00000-0000" maxlength="15" required />
+                        <span class="field-hint">Usaremos para confirmar o agendamento.</span>
+                        <span class="field-error">Telefone inválido.</span>
+                    </div>
+
+                    <div class="field col-full">
+                        <label class="field-label" for="endereco">Endereço completo <span class="req">*</span></label>
+                        <input class="field-input" type="text" id="endereco" name="endereco"
+                               placeholder="Rua, número, bairro, cidade — CEP" required />
+                        <span class="field-error">Campo obrigatório.</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- ── DADOS FÍSICOS ── -->
+            <div class="section">
+                <div class="section-title">Dados físicos</div>
+                <div class="grid-3">
+
+                    <div class="field">
+                        <label class="field-label" for="peso">Peso (kg) <span class="req">*</span></label>
+                        <input class="field-input" type="number" id="peso" name="peso"
+                               placeholder="Ex: 70" min="50" max="300" required />
+                        <span class="field-hint">Mínimo de 50 kg para doação.</span>
+                        <span class="field-error">Peso mínimo: 50 kg.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="altura">Altura (cm) <span class="req">*</span></label>
+                        <input class="field-input" type="number" id="altura" name="altura"
+                               placeholder="Ex: 170" min="140" max="220" required />
+                        <span class="field-hint">Peso e altura precisam resultar em IMC ≥ 18.5.</span>
+                        <span class="field-error">Altura inválida ou IMC abaixo do mínimo (18.5).</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="tipo_sanguineo">Tipo sanguíneo</label>
+                        <select class="field-input" id="tipo_sanguineo" name="tipo_sanguineo">
+                            <option value="">Não sei / Não informar</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A−</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B−</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB−</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O−</option>
+                        </select>
+                        <span class="field-hint">Opcional — será confirmado na triagem.</span>
+                    </div>
+
+                </div>
+
+                <div class="grid-2" style="margin-top:1.1rem;">
+                    <div class="field">
+                        <label class="field-label">Sexo biológico <span class="req">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-opt">
+                                <input type="radio" name="sexo" value="masculino" required />
+                                Masculino
+                            </label>
+                            <label class="radio-opt">
+                                <input type="radio" name="sexo" value="feminino" />
+                                Feminino
+                            </label>
+                        </div>
+                        <span class="field-hint">Necessário para cálculo do intervalo entre doações.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="ultima_doacao">Última doação de sangue</label>
+                        <input class="field-input" type="date" id="ultima_doacao" name="ultima_doacao" />
+                        <span class="field-hint">Homens: intervalo mín. 60 dias. Mulheres: 90 dias.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- ── HISTÓRICO DE DOAÇÃO ── -->
+            <div class="section">
+                <div class="field">
+                    <label class="field-label">Já doou sangue anteriormente? <span class="req">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-opt">
+                            <input type="radio" name="historico_doacao" value="nunca" required />
+                            Nunca doei
+                        </label>
+                        <label class="radio-opt">
+                            <input type="radio" name="historico_doacao" value="sim" />
+                            Já doei antes
+                        </label>
+                        <label class="radio-opt">
+                            <input type="radio" name="historico_doacao" value="regular" />
+                            Doador(a) regular
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="field">
+                    <label class="field-label" for="observacoes">Observações clínicas</label>
+                    <textarea class="field-input" id="observacoes" name="observacoes"
+                              placeholder="Informe alergias, dúvidas sobre elegibilidade, condições relevantes ou situações especiais..."></textarea>
+                    <span class="field-hint">Opcional. Qualquer informação extra que julgue relevante para a triagem.</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- ── INTERESSE E QUESTIONÁRIO ── -->
+            <div class="section">
+                <div class="section-title">Interesse e questionário de saúde</div>
+
+                <div class="field col-full" style="margin-bottom:1.1rem;">
+                    <label class="field-label">Você tem interesse em ser doador de sangue? <span class="req">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-opt">
+                            <input type="radio" name="interesse_doador" value="sim" checked required />
+                            Sim, tenho interesse
+                        </label>
+                        <label class="radio-opt">
+                            <input type="radio" name="interesse_doador" value="nao" />
+                            Não, só quero me cadastrar
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field col-full">
+                    <label class="field-label">Possui alguma condição de saúde relevante? <span class="req">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-opt">
+                            <input type="radio" name="condicao_saude" value="nao" checked required />
+                            Não
+                        </label>
+                        <label class="radio-opt">
+                            <input type="radio" name="condicao_saude" value="sim" />
+                            Sim
+                        </label>
+                    </div>
+                    <span class="field-hint">Ex: hipertensão, diabetes, uso de medicação contínua, cirurgia recente, gravidez, etc.</span>
+                </div>
+
+                <div class="field col-full" id="descricao-condicao-wrap" style="display:none; margin-top:1rem;">
+                    <label class="field-label" for="descricao_condicao">Descreva a condição de saúde</label>
+                    <textarea class="field-input" id="descricao_condicao" name="descricao_condicao"
+                              placeholder="Conte um pouco sobre a condição para que a equipe possa avaliar sua elegibilidade..."></textarea>
+                    <span class="field-hint">Essa informação será analisada pela instituição antes da confirmação do agendamento.</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- ── AGENDAMENTO ── -->
+            <div class="section">
+                <div class="section-title">Agendamento</div>
+                <div class="grid-2">
+
+                    <div class="field col-full">
+                        <label class="field-label" for="unidade">Hemocentro / Unidade coletora <span class="req">*</span></label>
+                        <select class="field-input" id="unidade" name="unidade" required>
+                            <option value="">Selecione a unidade mais próxima</option>
+                            <option value="hemomar_sao_luis">Hemomar — São Luís (Sede)</option>
+                            <option value="hemonucleo_balsas">Hemonúcleo — Balsas</option>
+                            <option value="hemonucleo_caxias">Hemonúcleo — Caxias</option>
+                            <option value="hemonucleo_codo">Hemonúcleo — Codó</option>
+                            <option value="hemonucleo_imperatriz">Hemonúcleo — Imperatriz</option>
+                            <option value="hemonucleo_pedreiras">Hemonúcleo — Pedreiras</option>
+                            <option value="hemonucleo_pinheiro">Hemonúcleo — Pinheiro</option>
+                            <option value="hemonucleo_santa_ines">Hemonúcleo — Santa Inês</option>
+                            <option value="outro">Outra unidade (informar nas observações)</option>
+                        </select>
+                        <span class="field-error">Selecione uma unidade.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="data_agendamento">Data preferida <span class="req">*</span></label>
+                        <input class="field-input" type="date" id="data_agendamento" name="data_agendamento" required />
+                        <span class="field-error">Selecione uma data.</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="turno">Turno <span class="req">*</span></label>
+                        <select class="field-input" id="turno" name="turno" required>
+                            <option value="">Selecione</option>
+                            <option value="manha">Manhã (07h – 12h)</option>
+                            <option value="tarde">Tarde (13h – 17h)</option>
+                        </select>
+                        <span class="field-error">Selecione um turno.</span>
+                    </div>
+
+                    <div class="field col-full">
+                        <label class="field-label" for="como_soube">Como ficou sabendo do programa de doação?</label>
+                        <select class="field-input" id="como_soube" name="como_soube">
+                            <option value="">Selecione (opcional)</option>
+                            <option value="hospital">Hospital ou UBS</option>
+                            <option value="indicacao">Indicação de amigo ou familiar</option>
+                            <option value="redes">Redes sociais</option>
+                            <option value="campanha">Campanha pública</option>
+                            <option value="hemocentro">Fui ao hemocentro diretamente</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── TERMO DE CONSENTIMENTO ── -->
+            <div class="section">
+                <div class="alert alert-info" style="margin-bottom:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>
+                        A doação de sangue é um <strong>ato voluntário, anônimo, altruísta e gratuito</strong>, regulamentado pela RDC ANVISA nº 204/2017 e normas do Ministério da Saúde.
+                        O sangue coletado passa por rigoroso controle de qualidade antes de ser distribuído.
+                    </span>
+                </div>
+                <label class="check-opt" style="margin-top:1rem; border-color: var(--red-border); background: var(--red-bg);">
+                    <input type="checkbox" id="consentimento" name="consentimento" value="1" required />
+                    <span style="font-size:0.85rem; color: var(--red);">
+                        Declaro que as informações acima são verdadeiras e que consinto com a coleta, processamento e distribuição anônima do meu sangue conforme as normas do Ministério da Saúde.
+                    </span>
+                </label>
+            </div>
+
+            <!-- ── FORM FOOTER ── -->
+            <div class="form-footer">
+                <div class="footer-note">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    Dados protegidos por sigilo médico
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check2-circle me-2"></i>Enviar cadastro
+                </button>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+<!-- ── SITE FOOTER ── -->
+<footer class="site-footer">
+    &copy; 2026 Fluxo Vital. Todos os direitos reservados. &nbsp;|&nbsp; Doe sangue. Doe vida.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+    /* ── Navbar scroll ── */
+    window.addEventListener('scroll', function () {
+        document.querySelector('.navbar-premium').classList.toggle('scrolled', window.scrollY > 30);
+    });
+
+    /* ── Máscara CPF ── */
+    document.getElementById('cpf').addEventListener('input', function () {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length <= 3)       this.value = v;
+        else if (v.length <= 6)  this.value = v.slice(0,3) + '.' + v.slice(3);
+        else if (v.length <= 9)  this.value = v.slice(0,3) + '.' + v.slice(3,6) + '.' + v.slice(6);
+        else                     this.value = v.slice(0,3) + '.' + v.slice(3,6) + '.' + v.slice(6,9) + '-' + v.slice(9,11);
+    });
+
+    /* ── Máscara Telefone ── */
+    document.getElementById('telefone').addEventListener('input', function () {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length <= 2)       this.value = '(' + v;
+        else if (v.length <= 7)  this.value = '(' + v.slice(0,2) + ') ' + v.slice(2);
+        else                     this.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7,11);
+    });
+
+    /* ── Verificação em tempo real de CPF / RG ── */
+    function setupLiveCheck(opts) {
+        const input = document.getElementById(opts.inputId);
+        const feedback = document.getElementById(opts.feedbackId);
+        if (!input || !feedback) return;
+        let timer = null;
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
+            const raw = opts.clean(input.value);
+            if (raw.length < opts.minLen) {
+                feedback.className = 'field-feedback';
+                feedback.textContent = '';
+                return;
+            }
+            feedback.className = 'field-feedback show checking';
+            feedback.textContent = 'Verificando...';
+            timer = setTimeout(function () {
+                fetch(opts.url + '?' + opts.param + '=' + encodeURIComponent(raw))
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data.existe) {
+                            feedback.className = 'field-feedback show warn';
+                            feedback.textContent = opts.msgExiste;
+                        } else {
+                            feedback.className = 'field-feedback show ok';
+                            feedback.textContent = opts.msgOk;
+                        }
+                    })
+                    .catch(function () {
+                        feedback.className = 'field-feedback';
+                        feedback.textContent = '';
+                    });
+            }, 500);
+        });
+    }
+
+    setupLiveCheck({
+        inputId: 'cpf', feedbackId: 'cpf-feedback',
+        url: '/api/cpf/verificar', param: 'cpf', minLen: 11,
+        clean: function (v) { return v.replace(/\D/g, ''); },
+        msgExiste: 'Este CPF já possui um cadastro em nosso sistema.',
+        msgOk: 'CPF disponível para cadastro.'
+    });
+
+    setupLiveCheck({
+        inputId: 'rg', feedbackId: 'rg-feedback',
+        url: '/api/rg/verificar', param: 'rg', minLen: 5,
+        clean: function (v) { return v.trim(); },
+        msgExiste: 'Este RG já consta em outro cadastro no sistema.',
+        msgOk: 'RG disponível.'
+    });
+
+    /* ── Exibe a descrição da condição de saúde apenas se "Sim" for marcado ── */
+    document.querySelectorAll('input[name="condicao_saude"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            document.getElementById('descricao-condicao-wrap').style.display =
+                (this.value === 'sim' && this.checked) ? 'block' : 'none';
+        });
+    });
+
+    /* ── Data mínima: amanhã ── */
+    const hoje = new Date();
+    hoje.setDate(hoje.getDate() + 1);
+    document.getElementById('data_agendamento').min = hoje.toISOString().split('T')[0];
+
+    /* ── Nascimento: idade entre 16 e 69 anos ── */
+    const maxNasc = new Date();
+    maxNasc.setFullYear(maxNasc.getFullYear() - 16);
+    document.getElementById('nascimento').max = maxNasc.toISOString().split('T')[0];
+
+    const minNasc = new Date();
+    minNasc.setFullYear(minNasc.getFullYear() - 69);
+    document.getElementById('nascimento').min = minNasc.toISOString().split('T')[0];
+
+    /* ── Validação client-side ── */
+    document.getElementById('main-form').addEventListener('submit', function (e) {
+        let valid = true;
+
+        this.querySelectorAll('[required]').forEach(function (el) {
+            if (el.type === 'radio') return;
+            if (el.type === 'checkbox') {
+                if (!el.checked) { el.closest('.check-opt').style.borderColor = 'var(--red)'; valid = false; }
+                return;
+            }
+            if (!el.value.trim()) {
+                el.classList.add('is-invalid');
+                valid = false;
+            } else {
+                el.classList.remove('is-invalid');
+            }
+        });
+
+        /* Valida grupos de radio obrigatórios */
+        ['sexo', 'historico_doacao'].forEach(function(name) {
+            const radios = document.querySelectorAll('[name="' + name + '"]');
+            const checked = Array.from(radios).some(r => r.checked);
+            if (!checked) {
+                radios.forEach(r => r.closest('.radio-opt').style.borderColor = 'var(--red)');
+                valid = false;
+            } else {
+                radios.forEach(r => r.closest('.radio-opt').style.borderColor = '');
+            }
+        });
+
+        /* Valida peso mínimo */
+        const pesoEl = document.getElementById('peso');
+        if (pesoEl.value && parseInt(pesoEl.value) < 50) {
+            pesoEl.classList.add('is-invalid');
+            valid = false;
+        }
+
+        /* Valida IMC mínimo (18.5) a partir de peso e altura */
+        const alturaEl = document.getElementById('altura');
+        if (pesoEl.value && alturaEl.value) {
+            const alturaM = parseFloat(alturaEl.value) / 100;
+            const imc = parseFloat(pesoEl.value) / (alturaM * alturaM);
+            if (!isNaN(imc) && imc < 18.5) {
+                alturaEl.classList.add('is-invalid');
+                pesoEl.classList.add('is-invalid');
+                valid = false;
+            }
+        }
+
+        /* Valida RG: se preenchido, precisa ter 12 números */
+        const rgEl = document.getElementById('rg');
+        const rgLimpo = rgEl.value.replace(/\D/g, '');
+        if (rgEl.value && !/^\d{12}$/.test(rgLimpo)) {
+            rgEl.classList.add('is-invalid');
+            valid = false;
+        }
+
+        /* Valida idade: 16 a 69 anos */
+        const nascEl = document.getElementById('nascimento');
+        const nasc = new Date(nascEl.value);
+        const agora = new Date();
+        let idade = agora.getFullYear() - nasc.getFullYear();
+        const mDiff = agora.getMonth() - nasc.getMonth();
+        if (mDiff < 0 || (mDiff === 0 && agora.getDate() < nasc.getDate())) idade--;
+        if (isNaN(idade) || idade < 16 || idade > 69) {
+            nascEl.classList.add('is-invalid');
+            valid = false;
+        }
+
+        if (!valid) e.preventDefault();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Home do Doador - Fluxo Vital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+  <link rel="shortcut icon" th:href="@{/assets/images/logo_fluxovital.png}" type="image/x-icon"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --red:        #9d040e;
+      --red-dark:   #7a030b;
+      --red-bg:     #fdf0f0;
+      --red-border: rgba(157,4,14,0.18);
+      --text:       #1a1a1a;
+      --muted:      #6b7280;
+      --border:     #e5e7eb;
+      --bg:         #ffffff;
+      --surface:    #f9fafb;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR PREMIUM (mesma identidade dos formulários) ── */
+    .navbar-premium {
+        background: linear-gradient(135deg, #9d040e 0%, #7B1B1B 100%);
+        padding: 1rem 0;
+        box-shadow: 0 10px 40px rgba(157, 4, 14, 0.4);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 4px solid #9d040e;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideDown 0.6s ease;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-100%); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .navbar-premium.scrolled {
+        padding: 0.7rem 0;
+        box-shadow: 0 8px 30px rgba(157, 4, 14, 0.5);
+    }
+
+    .navbar-premium .navbar-brand {
+        color: white !important;
+        font-weight: 900;
+        font-size: 1.6rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s ease;
+        letter-spacing: -0.5px;
+        text-decoration: none;
+        animation: fadeInLeft 0.6s ease 0.2s both;
+    }
+
+    @keyframes fadeInLeft {
+        from { opacity: 0; transform: translateX(-20px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .navbar-premium .navbar-brand:hover {
+        transform: translateX(5px) scale(1.03);
+        filter: drop-shadow(0 0 20px rgba(255,255,255,0.4));
+    }
+
+    .navbar-premium .navbar-brand img {
+        height: 50px;
+        width: auto;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        transition: all 0.4s ease;
+    }
+
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-main { font-size: 1.4rem; font-weight: 800; color: #fff; }
+    .logo-sub  { font-size: 0.7rem; color: #ffccd0; letter-spacing: 0.08em; font-weight: 400; }
+
+    .navbar-premium .nav-link {
+        color: rgba(255,255,255,0.95) !important;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.7rem 1.2rem !important;
+        margin: 0 0.1rem;
+        border-radius: 6px;
+        transition: color 0.2s ease;
+        position: relative;
+    }
+
+    .navbar-premium .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 1.2rem;
+        right: 1.2rem;
+        height: 2px;
+        background: white;
+        border-radius: 2px;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.25s ease;
+    }
+
+    .navbar-premium .nav-link:hover { color: white !important; }
+    .navbar-premium .nav-link:hover::after { transform: scaleX(1); }
+
+    .btn-login-premium {
+        background: white;
+        color: #c90101 !important;
+        padding: 0.7rem 1.8rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: 3px solid white;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 5px 20px rgba(255,255,255,0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-login-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(255,255,255,0.35);
+    }
+
+    .navbar-toggler {
+        border: 2px solid rgba(255,255,255,0.8);
+        padding: 0.45rem 0.7rem;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-toggler:focus { box-shadow: none; }
+    .navbar-toggler:hover { transform: scale(1.08); border-color: white; }
+    .navbar-toggler-icon { filter: brightness(0) invert(1); }
+
+    @media (max-width: 991px) {
+        .navbar-premium .navbar-collapse {
+            background: #7B1B1B;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .navbar-premium .nav-link {
+            padding: 0.7rem 1rem !important;
+            margin: 0.2rem 0;
+            border-radius: 10px;
+        }
+        .btn-login-premium {
+            width: 100%;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+    }
+
+    /* ── HERO DE BOAS-VINDAS ── */
+    .dash-hero {
+        background: linear-gradient(135deg, var(--red) 0%, #7B1B1B 100%);
+        padding: 2.4rem 0 2.2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .dash-hero i.hero-icon-decor {
+        position: absolute;
+        right: 6%;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 6rem;
+        color: #fff;
+        opacity: 0.10;
+        pointer-events: none;
+    }
+
+    .hero-inner { position: relative; z-index: 1; }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+
+    .dash-hero h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 2rem;
+        color: #fff;
+        margin-bottom: 6px;
+        line-height: 1.25;
+    }
+
+    .dash-hero h1 span { color: #ffd9dc; }
+
+    .dash-hero p {
+        font-size: 0.92rem;
+        color: rgba(255,255,255,0.85);
+        max-width: 560px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* ── CONTEÚDO PRINCIPAL ── */
+    main { flex: 1; }
+    .page-wrap { max-width: 1040px; margin: 0 auto; padding: 2.2rem 1.5rem 3rem; width: 100%; }
+
+    /* ── ALERTAS FLASH ── */
+    .alert-flash {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin-bottom: 1.8rem;
+    }
+    .alert-sucesso { background:#d1fae5; border:0.5px solid #6ee7b7; color:#065f46; }
+    .alert-erro    { background:var(--red-bg); border:0.5px solid var(--red-border); color:var(--red); }
+
+    /* ── CARDS DE AÇÃO ── */
+    .action-card {
+        background: var(--bg);
+        border: 0.5px solid var(--border);
+        border-radius: 16px;
+        padding: 1.8rem;
+        height: 100%;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 1.2rem 2.5rem rgba(123,30,56,0.12);
+        border-color: transparent;
+    }
+
+    .icon-circle {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--red-bg);
+        color: var(--red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-card h5 {
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .action-card p.desc {
+        font-size: 0.88rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 1.3rem;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--red);
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.88rem;
+        border-radius: 50px;
+        padding: 0.6rem 1.4rem;
+        border: none;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-action:hover { background: var(--red-dark); color: #fff; transform: translateY(-2px); }
+
+    .btn-action-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg);
+        color: var(--red);
+        font-weight: 600;
+        font-size: 0.88rem;
+        border-radius: 50px;
+        padding: 0.55rem 1.35rem;
+        border: 1.5px solid var(--red-border);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-outline:hover { background: var(--red-bg); color: var(--red-dark); border-color: var(--red); }
+
+    /* ── HISTÓRICO ── */
+    .history-card {
+        background: var(--bg);
+        border: 0.5px solid var(--border);
+        border-radius: 16px;
+        padding: 1.6rem 1.8rem;
+        margin-bottom: 1.6rem;
+    }
+
+    .history-card h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--red);
+        margin-bottom: 1.1rem;
+    }
+
+    .table-historico-wrap {
+        border: 0.5px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-historico { margin: 0; font-size: 0.87rem; }
+    .table-historico th {
+        background: var(--red);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border: none;
+        padding: 0.7rem 0.9rem;
+    }
+    .table-historico td { padding: 0.65rem 0.9rem; vertical-align: middle; color: var(--text); }
+    .table-historico tbody tr:hover { background: var(--surface); }
+
+    .badge-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.74rem;
+        font-weight: 600;
+    }
+    .badge-pendente   { background:#fff3cd; color:#856404; }
+    .badge-confirmado { background:#d4edda; color:#155724; }
+    .badge-cancelado  { background:#f8d7da; color:#721c24; }
+    .badge-realizado  { background:#cce5ff; color:#004085; }
+
+    /* ── Ações de agendamento (confirmar/cancelar) ── */
+    .acoes-agendamento { display:flex; gap:6px; flex-wrap:wrap; }
+    .btn-mini {
+        border:none; border-radius:20px; padding:4px 12px; font-size:0.74rem;
+        font-weight:600; cursor:pointer; transition:all .2s ease;
+    }
+    .btn-mini-confirmar { background:#d4edda; color:#155724; }
+    .btn-mini-confirmar:hover { background:#b8e2c3; }
+    .btn-mini-cancelar { background:#f8d7da; color:#721c24; }
+    .btn-mini-cancelar:hover { background:#f2b8c0; }
+
+    /* ── FOOTER ── */
+    .site-footer {
+        background: var(--bg);
+        border-top: 0.5px solid var(--border);
+        text-align: center;
+        padding: 1.2rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+        .dash-hero h1 { font-size: 1.55rem; }
+        .action-card { padding: 1.4rem; }
+        .history-card { padding: 1.3rem 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar navbar-expand-lg navbar-premium">
+  <div class="container">
+
+    <a class="navbar-brand" th:href="@{/doador/home}">
+      <img th:src="@{/assets/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'"/>
+      <div class="logo-text">
+        <span class="logo-main">Fluxo Vital</span>
+        <span class="logo-sub">Salvando Vidas</span>
+      </div>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/}"><i class="bi bi-house-door-fill me-1"></i>Início</a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a class="btn-login-premium" th:href="@{/doador/logout}">
+            <i class="bi bi-box-arrow-right"></i> Sair
+          </a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ── HERO DE BOAS-VINDAS ── -->
+<div class="dash-hero">
+  <i class="bi bi-heart-pulse-fill hero-icon-decor"></i>
+  <div class="container hero-inner">
+    <div class="hero-badge"><i class="bi bi-person-check-fill"></i> Área do Doador</div>
+    <h1>Bem-vindo(a), <span th:text="${nome}">Doador</span>!</h1>
+    <p>Tipo de doação cadastrado: <strong th:text="${tipoDoador}" style="color:#fff;">sangue</strong>. Acompanhe seus formulários e continue fazendo parte dessa corrente do bem.</p>
+  </div>
+</div>
+
+<main>
+  <div class="page-wrap">
+
+    <!-- Mensagens flash -->
+    <div th:if="${sucesso}" class="alert-flash alert-sucesso" role="alert">
+      <i class="bi bi-check-circle-fill"></i>
+      <span th:text="${sucesso}"></span>
+    </div>
+    <div th:if="${erro}" class="alert-flash alert-erro" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span th:text="${erro}"></span>
+    </div>
+
+    <!-- Cards de ação -->
+    <div class="row g-4 mb-5">
+
+      <div class="col-lg-8">
+        <div class="action-card">
+          <div class="icon-circle"><i class="bi bi-clipboard2-pulse"></i></div>
+          <h5>Preencher formulário</h5>
+          <p class="desc">
+            Envie um formulário de doação para análise da instituição. Você pode preencher quantas vezes quiser,
+            inclusive para outros tipos de doação ou para agendar uma nova data.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <a th:href="@{/doador/sangue/form}" class="btn-action">
+              <i class="bi bi-droplet-fill"></i> Doar Sangue
+            </a>
+            <a th:href="@{/doador/medula/form}" class="btn-action">
+              <i class="bi bi-heart-pulse-fill"></i> Doar Medula Óssea
+            </a>
+            <a th:href="@{/doador/leite/form}" class="btn-action">
+              <i class="bi bi-cup-hot-fill"></i> Doar Leite
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="action-card">
+          <div class="icon-circle"><i class="bi bi-hospital"></i></div>
+          <h5>Instituições próximas</h5>
+          <p class="desc">Veja onde você pode realizar sua doação.</p>
+          <a th:href="@{/instituicao/buscar}" class="btn-action-outline">
+            <i class="bi bi-geo-alt-fill"></i> Ver locais
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Histórico de formulários enviados (sangue) -->
+    <div th:if="${formulariosSangue != null and !formulariosSangue.isEmpty()}" class="history-card">
+      <h4><i class="bi bi-clock-history"></i> Seus formulários de doação de sangue</h4>
+      <div class="table-historico-wrap">
+        <table class="table table-hover mb-0 table-historico">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data agendada</th>
+              <th>Unidade</th>
+              <th>Tipo sanguíneo</th>
+              <th>Enviado em</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="f : ${formulariosSangue}">
+              <td th:text="${f.id}"></td>
+              <td th:text="${f.dataAgendamento != null ? #temporals.format(f.dataAgendamento,'dd/MM/yyyy') : '—'}"></td>
+              <td th:text="${f.unidade != null ? f.unidade : '—'}"></td>
+              <td th:text="${f.tipoSanguineo != null ? f.tipoSanguineo : '—'}"></td>
+              <td th:text="${f.criadoEm != null ? #temporals.format(f.criadoEm,'dd/MM/yyyy HH:mm') : '—'}"></td>
+              <td>
+                <span class="badge-status"
+                      th:classappend="'badge-' + ${f.status.name()}"
+                      th:text="${f.status}"></span>
+              </td>
+              <td>
+                <div class="acoes-agendamento">
+                  <form th:if="${f.status.name() == 'pendente'}"
+                        th:action="@{'/doador/agendamento/sangue/' + ${f.id} + '/confirmar'}" method="POST">
+                    <button type="submit" class="btn-mini btn-mini-confirmar">Confirmar</button>
+                  </form>
+                  <form th:if="${f.status.name() == 'pendente' or f.status.name() == 'confirmado'}"
+                        th:action="@{'/doador/agendamento/sangue/' + ${f.id} + '/cancelar'}" method="POST"
+                        onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?');">
+                    <button type="submit" class="btn-mini btn-mini-cancelar">Cancelar</button>
+                  </form>
+                  <span th:if="${f.status.name() == 'cancelado' or f.status.name() == 'realizado'}" style="font-size:0.74rem;color:var(--muted);">—</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Histórico de formulários enviados (medula) -->
+    <div th:if="${formulariosMedula != null and !formulariosMedula.isEmpty()}" class="history-card">
+      <h4><i class="bi bi-clock-history"></i> Seus formulários de doação de medula óssea</h4>
+      <div class="table-historico-wrap">
+        <table class="table table-hover mb-0 table-historico">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data agendada</th>
+              <th>Unidade</th>
+              <th>Modalidade</th>
+              <th>Enviado em</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="f : ${formulariosMedula}">
+              <td th:text="${f.id}"></td>
+              <td th:text="${f.dataColeta != null ? #temporals.format(f.dataColeta,'dd/MM/yyyy') : '—'}"></td>
+              <td th:text="${f.unidade != null ? f.unidade : '—'}"></td>
+              <td th:text="${f.modalidade != null ? f.modalidade : '—'}"></td>
+              <td th:text="${f.criadoEm != null ? #temporals.format(f.criadoEm,'dd/MM/yyyy HH:mm') : '—'}"></td>
+              <td>
+                <span class="badge-status"
+                      th:classappend="'badge-' + ${f.status.name()}"
+                      th:text="${f.status}"></span>
+              </td>
+              <td>
+                <div class="acoes-agendamento">
+                  <form th:if="${f.status.name() == 'pendente'}"
+                        th:action="@{'/doador/agendamento/medula/' + ${f.id} + '/confirmar'}" method="POST">
+                    <button type="submit" class="btn-mini btn-mini-confirmar">Confirmar</button>
+                  </form>
+                  <form th:if="${f.status.name() == 'pendente' or f.status.name() == 'confirmado'}"
+                        th:action="@{'/doador/agendamento/medula/' + ${f.id} + '/cancelar'}" method="POST"
+                        onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?');">
+                    <button type="submit" class="btn-mini btn-mini-cancelar">Cancelar</button>
+                  </form>
+                  <span th:if="${f.status.name() == 'cancelado' or f.status.name() == 'realizado'}" style="font-size:0.74rem;color:var(--muted);">—</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Histórico de formulários enviados (leite) -->
+    <div th:if="${formulariosLeite != null and !formulariosLeite.isEmpty()}" class="history-card">
+      <h4><i class="bi bi-clock-history"></i> Seus formulários de doação de leite</h4>
+      <div class="table-historico-wrap">
+        <table class="table table-hover mb-0 table-historico">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data agendada</th>
+              <th>Unidade</th>
+              <th>Enviado em</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="f : ${formulariosLeite}">
+              <td th:text="${f.id}"></td>
+              <td th:text="${f.dataAgendamento != null ? #temporals.format(f.dataAgendamento,'dd/MM/yyyy') : '—'}"></td>
+              <td th:text="${f.unidade != null ? f.unidade : '—'}"></td>
+              <td th:text="${f.criadoEm != null ? #temporals.format(f.criadoEm,'dd/MM/yyyy HH:mm') : '—'}"></td>
+              <td>
+                <span class="badge-status"
+                      th:classappend="'badge-' + ${f.status.name()}"
+                      th:text="${f.status}"></span>
+              </td>
+              <td>
+                <div class="acoes-agendamento">
+                  <form th:if="${f.status.name() == 'pendente'}"
+                        th:action="@{'/doador/agendamento/leite/' + ${f.id} + '/confirmar'}" method="POST">
+                    <button type="submit" class="btn-mini btn-mini-confirmar">Confirmar</button>
+                  </form>
+                  <form th:if="${f.status.name() == 'pendente' or f.status.name() == 'confirmado'}"
+                        th:action="@{'/doador/agendamento/leite/' + ${f.id} + '/cancelar'}" method="POST"
+                        onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?');">
+                    <button type="submit" class="btn-mini btn-mini-cancelar">Cancelar</button>
+                  </form>
+                  <span th:if="${f.status.name() == 'cancelado' or f.status.name() == 'realizado'}" style="font-size:0.74rem;color:var(--muted);">—</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  &copy; 2025 Fluxo Vital. Todos os direitos reservados. &nbsp;|&nbsp; Obrigado por fazer parte dessa corrente do bem.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+  window.addEventListener('scroll', function () {
+    document.querySelector('.navbar-premium').classList.toggle('scrolled', window.scrollY > 30);
+  });
+</script>
+
+</body>
+</html>

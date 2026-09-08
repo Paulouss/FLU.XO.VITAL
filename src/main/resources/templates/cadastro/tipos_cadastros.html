@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fluxo Vital — Como você quer Começar?</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <th:block th:replace="~{fragments/layout :: css-global}"></th:block>
+
+  <style>
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ========== ONBOARDING ========== */
+    .onboarding-wrapper {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 5rem 2rem;
+    }
+
+    .badge-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; padding: 0.65rem 1.6rem; border-radius: 50px;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 1.5rem; box-shadow: 0 8px 25px rgba(157,4,14,0.3);
+    }
+
+    .onboarding-title {
+      font-size: 3rem; font-weight: 900; color: var(--text-dark);
+      margin-bottom: 1rem; line-height: 1.1; letter-spacing: -1px; text-align: center;
+    }
+
+    .onboarding-title .gradient-text {
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .onboarding-desc { font-size: 1.1rem; color: var(--text-gray); max-width: 560px; margin: 0 auto 4rem; line-height: 1.8; text-align: center; }
+
+    .onboarding-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2rem; width: 100%; max-width: 1000px;
+    }
+
+    .onboarding-card {
+      background: white; border-radius: 25px; padding: 2.5rem 2rem; text-align: center;
+      border: 3px solid transparent; position: relative; overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.07); animation: fadeInUp 0.6s ease both;
+    }
+
+    .onboarding-card:nth-child(1) { animation-delay: 0.1s; }
+    .onboarding-card:nth-child(2) { animation-delay: 0.25s; }
+    .onboarding-card:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .onboarding-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+    }
+
+    .onboarding-card:hover { transform: translateY(-12px); border-color: var(--primary-red); box-shadow: 0 30px 70px rgba(157,4,14,0.2); }
+    .onboarding-card:hover::before { transform: scaleX(1); }
+
+    .card-icon {
+      width: 90px; height: 90px; margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, rgba(157,4,14,0.1), rgba(157,4,14,0.04));
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease;
+    }
+
+    .onboarding-card:hover .card-icon { transform: scale(1.1); }
+
+    .card-icon i {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .card-title { font-size: 1.3rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.8rem; }
+    .card-desc { color: var(--text-gray); line-height: 1.7; margin-bottom: 2rem; font-size: 0.95rem; }
+
+    .btn-action {
+      display: block; width: 100%; padding: 1rem;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; border: none; border-radius: 14px; font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(157,4,14,0.28); text-decoration: none;
+    }
+
+    .btn-action:hover { transform: translateY(-3px); box-shadow: 0 14px 35px rgba(157,4,14,0.42); color: white; }
+
+    .btn-action.outline {
+      background: transparent; color: var(--primary-red);
+      border: 2px solid var(--primary-red); box-shadow: none;
+    }
+
+    .btn-action.outline:hover {
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; box-shadow: 0 8px 25px rgba(157,4,14,0.28);
+    }
+
+    @media (max-width: 900px) { .onboarding-grid { grid-template-columns: 1fr; max-width: 420px; } .onboarding-title { font-size: 2.2rem; } }
+    @media (max-width: 576px) { .onboarding-wrapper { padding: 3rem 1rem; } .onboarding-title { font-size: 1.8rem; } }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div th:replace="~{fragments/layout :: navbar-simples}"></div>
+
+  <!-- ONBOARDING -->
+  <div class="onboarding-wrapper">
+
+    <div class="badge-label">
+      <i class="fa-solid fa-circle-user"></i>
+      <span>Faça Parte</span>
+    </div>
+
+    <h1 class="onboarding-title">
+      Como você quer <span class="gradient-text">Começar?</span>
+    </h1>
+
+    <p class="onboarding-desc">
+      Escolha o perfil que melhor representa você e dê o primeiro passo para salvar vidas.
+    </p>
+
+    <div class="onboarding-grid">
+
+      <div class="onboarding-card">
+        <div class="card-icon"><i class="fa-solid fa-heart"></i></div>
+        <h3 class="card-title">Sou doador</h3>
+        <p class="card-desc">Cadastre-se como doador de sangue, medula óssea ou leite materno e conecte-se com quem precisa de você.</p>
+        <a th:href="@{/cadastro/doador/categoria}" class="btn-action">Cadastrar como doador</a>
+      </div>
+
+      <div class="onboarding-card">
+        <div class="card-icon"><i class="fa-solid fa-hospital"></i></div>
+        <h3 class="card-title">Sou uma instituição</h3>
+        <p class="card-desc">Gerencie agendamentos, estoque de doações e conecte sua instituição a uma rede de doadores qualificados.</p>
+        <a th:href="@{/instituicao/categoria}" class="btn-action">Cadastrar instituição</a>
+      </div>
+
+      <div class="onboarding-card">
+        <div class="card-icon"><i class="fa-solid fa-eye"></i></div>
+        <h3 class="card-title">Explorar a plataforma</h3>
+        <p class="card-desc">Veja como funciona o Fluxo Vital antes de se cadastrar: campanhas, relatórios e histórias de vidas salvas.</p>
+        <a th:href="@{/}" class="btn-action outline">Explorar sem cadastro</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div th:replace="~{fragments/layout :: footer}"></div>
+
+  <script>
+    window.addEventListener('scroll', function () {
+      document.querySelector('.navbar-premium').classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fluxo Vital — Escolha sua Doação</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <th:block th:replace="~{fragments/layout :: css-global}"></th:block>
+
+  <style>
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ========== BREADCRUMB ========== */
+    .breadcrumb-bar { background: rgba(157,4,14,0.05); border-bottom: 1px solid rgba(157,4,14,0.1); padding: 0.8rem 0; }
+    .breadcrumb-bar .container { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-gray); }
+    .breadcrumb-bar a { color: var(--primary-red); text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
+    .breadcrumb-bar a:hover { opacity: 0.75; }
+    .breadcrumb-bar i { font-size: 0.7rem; color: var(--text-gray); }
+    .breadcrumb-bar span { font-weight: 600; color: var(--text-dark); }
+
+    /* ========== ESCOLHA DE CATEGORIA ========== */
+    .category-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem 2rem; }
+
+    .badge-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; padding: 0.65rem 1.6rem; border-radius: 50px;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 1.5rem; box-shadow: 0 8px 25px rgba(157,4,14,0.3);
+    }
+
+    .category-title { font-size: 3rem; font-weight: 900; color: var(--text-dark); margin-bottom: 1rem; line-height: 1.1; letter-spacing: -1px; text-align: center; }
+    .category-title .gradient-text { background: linear-gradient(135deg, var(--primary-red), var(--dark-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .category-desc { font-size: 1.1rem; color: var(--text-gray); max-width: 580px; margin: 0 auto 4rem; line-height: 1.8; text-align: center; }
+
+    .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; width: 100%; max-width: 1000px; }
+
+    .category-card {
+      background: white; border-radius: 25px; padding: 2.8rem 2rem; text-align: center;
+      border: 3px solid transparent; position: relative; overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.07); animation: fadeInUp 0.6s ease both;
+      text-decoration: none; display: flex; flex-direction: column; align-items: center;
+    }
+
+    .category-card:nth-child(1) { animation-delay: 0.1s; }
+    .category-card:nth-child(2) { animation-delay: 0.25s; }
+    .category-card:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .category-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+      transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+    }
+
+    .card-blood::before   { background: linear-gradient(135deg, #c0392b, #922b21); }
+    .card-marrow::before  { background: linear-gradient(135deg, #2980b9, #1a5276); }
+    .card-milk::before    { background: linear-gradient(135deg, #e67e22, #b9770e); }
+
+    .category-card:hover { transform: translateY(-14px); box-shadow: 0 30px 70px rgba(0,0,0,0.14); }
+    .card-blood:hover  { border-color: #c0392b; }
+    .card-marrow:hover { border-color: #2980b9; }
+    .card-milk:hover   { border-color: #e67e22; }
+    .category-card:hover::before { transform: scaleX(1); }
+
+    .cat-icon { width: 100px; height: 100px; margin: 0 auto 1.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; position: relative; }
+    .card-blood  .cat-icon { background: rgba(192,57,43,0.1); }
+    .card-marrow .cat-icon { background: rgba(41,128,185,0.1); }
+    .card-milk   .cat-icon { background: rgba(230,126,34,0.1); }
+    .category-card:hover .cat-icon { transform: scale(1.1); }
+
+    .cat-icon i { font-size: 2.8rem; }
+    .card-blood  .cat-icon i { color: #c0392b; }
+    .card-marrow .cat-icon i { color: #2980b9; }
+    .card-milk   .cat-icon i { color: #e67e22; }
+
+    .cat-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.9rem; border-radius: 50px; margin-bottom: 1.2rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .card-blood  .cat-tag { background: rgba(192,57,43,0.1); color: #922b21; }
+    .card-marrow .cat-tag { background: rgba(41,128,185,0.1); color: #1a5276; }
+    .card-milk   .cat-tag { background: rgba(230,126,34,0.1); color: #b9770e; }
+
+    .cat-title { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.8rem; }
+    .cat-desc { color: var(--text-gray); line-height: 1.7; font-size: 0.95rem; margin-bottom: 2rem; flex: 1; }
+
+    .cat-reqs { list-style: none; padding: 0; margin-bottom: 2rem; width: 100%; text-align: left; }
+    .cat-reqs li { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-gray); padding: 0.4rem 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .cat-reqs li:last-child { border-bottom: none; }
+    .cat-reqs li i { font-size: 0.75rem; min-width: 14px; }
+    .card-blood  .cat-reqs li i { color: #c0392b; }
+    .card-marrow .cat-reqs li i { color: #2980b9; }
+    .card-milk   .cat-reqs li i { color: #e67e22; }
+
+    .btn-cat { display: block; width: 100%; padding: 1rem; border: none; border-radius: 14px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: white; margin-top: auto; }
+    .card-blood  .btn-cat { background: linear-gradient(135deg, #c0392b, #922b21); box-shadow: 0 8px 25px rgba(192,57,43,0.35); }
+    .card-marrow .btn-cat { background: linear-gradient(135deg, #2980b9, #1a5276); box-shadow: 0 8px 25px rgba(41,128,185,0.35); }
+    .card-milk   .btn-cat { background: linear-gradient(135deg, #e67e22, #b9770e); box-shadow: 0 8px 25px rgba(230,126,34,0.35); }
+    .btn-cat:hover { color: white; transform: translateY(-3px); filter: brightness(1.08); }
+
+    .btn-back { display: inline-flex; align-items: center; gap: 8px; margin-top: 3rem; color: var(--text-gray); font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: none; background: none; cursor: pointer; }
+    .btn-back:hover { color: var(--primary-red); transform: translateX(-4px); }
+
+    @media (max-width: 900px) { .category-grid { grid-template-columns: 1fr; max-width: 420px; } .category-title { font-size: 2.2rem; } }
+    @media (max-width: 576px) { .category-wrapper { padding: 3rem 1rem; } .category-title { font-size: 1.8rem; } }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div th:replace="~{fragments/layout :: navbar-simples}"></div>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <a th:href="@{/}"><i class="bi bi-house-fill"></i> Início</a>
+      <i class="bi bi-chevron-right"></i>
+      <a th:href="@{/cadastro/tipos}">Cadastro</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Escolha sua doação</span>
+    </div>
+  </div>
+
+  <!-- ESCOLHA DE CATEGORIA -->
+  <div class="category-wrapper">
+
+    <div class="badge-label">
+      <i class="fa-solid fa-droplet"></i>
+      <span>Seja um doador</span>
+    </div>
+
+    <h1 class="category-title">
+      Qual tipo de doação <span class="gradient-text">deseja fazer?</span>
+    </h1>
+
+    <p class="category-desc">
+      Cada tipo de doação salva vidas de formas diferentes. Escolha a categoria que melhor se encaixa no seu perfil e dê o próximo passo.
+    </p>
+
+    <div class="category-grid">
+
+      <!-- SANGUE -->
+      <div class="category-card card-blood">
+        <div class="cat-icon"><i class="fa-solid fa-droplet"></i></div>
+        <span class="cat-tag"><i class="fa-solid fa-circle-check"></i> Mais comum</span>
+        <h3 class="cat-title">Doação de Sangue</h3>
+        <p class="cat-desc">Uma doação pode salvar até quatro vidas. O processo é simples, rápido e seguro.</p>
+        <ul class="cat-reqs">
+          <li><i class="fa-solid fa-check"></i> Entre 16 e 69 anos</li>
+          <li><i class="fa-solid fa-check"></i> Peso acima de 50 kg</li>
+          <li><i class="fa-solid fa-check"></i> Boa saúde geral</li>
+          <li><i class="fa-solid fa-check"></i> Documento com foto</li>
+        </ul>
+        <!-- Seleciona tipo na sessão e redireciona para o cadastro -->
+        <a th:href="@{/cadastro/doador/selecionar(tipo='sangue')}" class="btn-cat">Quero doar sangue</a>
+      </div>
+
+      <!-- MÉDULA ÓSSEA -->
+      <div class="category-card card-marrow">
+        <div class="cat-icon"><i class="fa-solid fa-bone"></i></div>
+        <span class="cat-tag"><i class="fa-solid fa-star"></i> Alta demanda</span>
+        <h3 class="cat-title">Doação de Médula Óssea</h3>
+        <p class="cat-desc">Cadastre-se como doador e ofereça esperança a pacientes com leucemia e outras doenças graves.</p>
+        <ul class="cat-reqs">
+          <li><i class="fa-solid fa-check"></i> Entre 18 e 55 anos</li>
+          <li><i class="fa-solid fa-check"></i> Boa saúde geral</li>
+          <li><i class="fa-solid fa-check"></i> Coleta simples de sangue</li>
+          <li><i class="fa-solid fa-check"></i> Cadastro no REDOME</li>
+        </ul>
+        <a th:href="@{/cadastro/doador/selecionar(tipo='medula')}" class="btn-cat">Quero me cadastrar</a>
+      </div>
+
+      <!-- LEITE MATERNO -->
+      <div class="category-card card-milk">
+        <div class="cat-icon"><i class="fa-solid fa-baby"></i></div>
+        <span class="cat-tag"><i class="fa-solid fa-heart"></i> Para bebês</span>
+        <h3 class="cat-title">Doação de Leite Materno</h3>
+        <p class="cat-desc">Ajude bebês prematuros e recém-nascidos em situação de risco com uma doação preciosa.</p>
+        <ul class="cat-reqs">
+          <li><i class="fa-solid fa-check"></i> Estar amamentando</li>
+          <li><i class="fa-solid fa-check"></i> Boa saúde geral</li>
+          <li><i class="fa-solid fa-check"></i> Não fumar ou beber</li>
+          <li><i class="fa-solid fa-check"></i> Triagem prévia</li>
+        </ul>
+        <a th:href="@{/cadastro/doador/selecionar(tipo='leite')}" class="btn-cat">Quero doar leite</a>
+      </div>
+
+    </div>
+
+    <a th:href="@{/}" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Voltar à página inicial
+    </a>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div th:replace="~{fragments/layout :: footer}"></div>
+
+  <script>
+    window.addEventListener('scroll', function () {
+      document.querySelector('.navbar-premium').classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>

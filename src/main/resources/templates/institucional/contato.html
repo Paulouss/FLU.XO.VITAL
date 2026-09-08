@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contato — Fluxo Vital</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <th:block th:replace="~{fragments/layout :: css-global}"></th:block>
+
+  <style>
+    body { min-height: 100vh; }
+
+    .inst-wrapper { max-width: 1200px; margin: 0 auto; padding: 5rem 2rem; }
+    .inst-intro { text-align: center; margin-bottom: 4rem; }
+    .inst-title { font-size: 2.8rem; font-weight: 900; color: var(--text-dark); margin-bottom: 1rem; line-height: 1.15; letter-spacing: -1px; }
+    .inst-title .gradient-text { background: linear-gradient(135deg, var(--primary-red), var(--dark-red)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .inst-description { font-size: 1.1rem; color: var(--text-gray); max-width: 720px; margin: 0 auto; line-height: 1.8; }
+
+    .badge-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; padding: 0.65rem 1.6rem; border-radius: 50px;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 1.5rem; box-shadow: 0 8px 25px rgba(157,4,14,0.3);
+    }
+
+    .contato-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 2.5rem; align-items: start; margin-bottom: 3rem; }
+    @media (max-width: 900px) { .contato-grid { grid-template-columns: 1fr; } }
+
+    .contato-cards { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .contato-card {
+      background: white; border-radius: 22px; padding: 2rem;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.06); border: 3px solid transparent;
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      transition: all 0.3s ease;
+    }
+    .contato-card:hover { transform: translateY(-6px); border-color: var(--primary-red); box-shadow: 0 20px 55px rgba(157,4,14,0.15); }
+
+    .contato-icon {
+      flex: none; width: 60px; height: 60px;
+      background: linear-gradient(135deg, rgba(157,4,14,0.1), rgba(157,4,14,0.04));
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    }
+    .contato-icon i { font-size: 1.5rem; color: var(--primary-red); }
+
+    .contato-card h3 { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.4rem; }
+    .contato-card p { color: var(--text-gray); line-height: 1.6; font-size: 0.93rem; margin: 0 0 0.3rem; }
+    .contato-card a.tel-link { color: var(--primary-red); font-weight: 700; text-decoration: none; }
+    .contato-card a.tel-link:hover { text-decoration: underline; }
+    .contato-card .small-note { font-size: 0.8rem; color: var(--text-gray); }
+
+    .contato-form-block {
+      background: white; border-radius: 25px; padding: 2.5rem;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.06);
+    }
+    .contato-form-block h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-dark); margin-bottom: 1.5rem; }
+
+    .form-group { margin-bottom: 1.3rem; }
+    .form-label { color: var(--text-dark); font-weight: 600; margin-bottom: 0.5rem; display: block; font-size: 0.9rem; }
+    .form-input {
+      width: 100%; padding: 0.9rem 1rem; background: var(--light-pink);
+      border: 2px solid rgba(157,4,14,0.08); border-radius: 10px; color: var(--text-dark);
+      transition: all 0.3s ease; font-size: 0.93rem; font-family: 'Inter', sans-serif;
+    }
+    .form-input:focus { outline: none; background: white; border-color: var(--primary-red); box-shadow: 0 0 0 3px rgba(157,4,14,0.12); }
+    .btn-submit-contato {
+      width: 100%; padding: 1.1rem; background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem;
+      cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(157,4,14,0.28);
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-submit-contato:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(157,4,14,0.4); }
+
+    @media (max-width: 768px) {
+      .inst-wrapper { padding: 3rem 1rem; }
+      .inst-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div th:replace="~{fragments/layout :: navbar}"></div>
+
+  <main class="inst-wrapper">
+
+    <section class="inst-intro">
+      <div class="badge-label"><i class="fa-solid fa-envelope"></i><span>Fale Conosco</span></div>
+      <h1 class="inst-title">Entre em <span class="gradient-text">Contato</span></h1>
+      <p class="inst-description">
+        Tem dúvidas sobre doação de sangue, medula óssea ou leite materno? Fale com a gente
+        ou entre em contato diretamente com a Hemomar, banco de sangue parceiro em São Luís.
+      </p>
+    </section>
+
+    <div class="contato-grid">
+
+      <div class="contato-cards">
+
+        <div class="contato-card">
+          <div class="contato-icon"><i class="fa-solid fa-droplet"></i></div>
+          <div>
+            <h3>Hemomar — Banco de Sangue</h3>
+            <p><a class="tel-link" href="tel:+559832161100">(98) 3216-1100</a></p>
+            <p><a class="tel-link" href="https://wa.me/559891623334">(98) 9162-3334</a> <span class="small-note">— WhatsApp, somente para agendamento</span></p>
+            <p class="small-note">Rua Cinco de Janeiro, s/n — Jordoa, São Luís/MA. Seg. a sex.: 8h às 18h · Sáb.: 8h às 12h.</p>
+          </div>
+        </div>
+
+        <div class="contato-card">
+          <div class="contato-icon"><i class="fa-solid fa-headset"></i></div>
+          <div>
+            <h3>Equipe Fluxo Vital</h3>
+            <p><a class="tel-link" href="tel:+5598985087878">(98) 98508-7878</a></p>
+            <p><a class="tel-link" href="tel:+5598981914006">(98) 98191-4006</a></p>
+            <p class="small-note">Atendimento sobre o funcionamento da plataforma e suporte a doadores e instituições.</p>
+          </div>
+        </div>
+
+        <div class="contato-card">
+          <div class="contato-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div>
+            <h3>E-mail</h3>
+            <p><a class="tel-link" href="mailto:contato@fluxovital.com.org">contato@fluxovital.com.org</a></p>
+            <p class="small-note">Respondemos em até 2 dias úteis.</p>
+          </div>
+        </div>
+
+        <div class="contato-card">
+          <div class="contato-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <h3>Endereço</h3>
+            <p>Universidade CEUMA — Campus Renascença</p>
+            <p class="small-note">São Luís — MA</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="contato-form-block">
+        <h3>Envie uma mensagem</h3>
+        <form>
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-input" placeholder="Seu nome completo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-input" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input type="tel" class="form-input" placeholder="(98) 98765-4321">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mensagem</label>
+            <textarea class="form-input" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>
+          </div>
+          <button type="button" class="btn-submit-contato">Enviar Mensagem</button>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <div th:replace="~{fragments/layout :: footer}"></div>
+
+  <script>
+    window.addEventListener('scroll', function () {
+      document.querySelector('.navbar-premium').classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>

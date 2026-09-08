@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Área da Instituição | Fluxo Vital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --red:        #9d040e;
+      --red-dark:   #7a030b;
+      --text:       #1a1a1a;
+      --muted:      #6b7280;
+      --border:     #e5e7eb;
+      --bg:         #ffffff;
+      --surface:    #f9fafb;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar-premium {
+      background: linear-gradient(135deg, var(--red) 0%, #7B1B1B 100%);
+      padding: 1rem 0;
+      box-shadow: 0 10px 40px rgba(157, 4, 14, 0.4);
+      position: sticky; top: 0; z-index: 1000;
+      border-bottom: 4px solid var(--red);
+    }
+    .navbar-premium .navbar-brand {
+      color: white !important; font-weight: 900; font-size: 1.6rem;
+      display: flex; align-items: center; gap: 12px; text-decoration: none;
+    }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-main { font-size: 1.4rem; font-weight: 800; color: #fff; }
+    .logo-sub  { font-size: 0.7rem; color: #ffccd0; letter-spacing: 0.08em; }
+    .navbar-premium .nav-link {
+      color: rgba(255,255,255,0.95) !important; font-weight: 600; font-size: 0.95rem;
+      padding: 0.7rem 1.2rem !important;
+    }
+    .btn-login-premium {
+      background: white; color: #c90101 !important; padding: 0.7rem 1.8rem;
+      border-radius: 50px; font-weight: 700; font-size: 0.95rem; border: 3px solid white;
+      transition: transform 0.2s ease, box-shadow 0.2s ease; display: inline-flex;
+      align-items: center; gap: 8px; text-decoration: none;
+    }
+    .btn-login-premium:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,255,255,0.35); }
+    .navbar-toggler { border: 2px solid rgba(255,255,255,0.8); }
+    .navbar-toggler:focus { box-shadow: none; }
+    .navbar-toggler-icon { filter: brightness(0) invert(1); }
+    @media (max-width: 991px) {
+      .navbar-premium .navbar-collapse { background: #7B1B1B; border-radius: 16px; padding: 1rem; margin-top: 0.8rem; }
+      .btn-login-premium { width: 100%; justify-content: center; margin-top: 0.5rem; }
+    }
+
+    /* ── HERO ── */
+    .dash-hero {
+      background: linear-gradient(135deg, var(--red) 0%, #7B1B1B 100%);
+      padding: 2.4rem 0 2.2rem; position: relative; overflow: hidden;
+    }
+    .dash-hero i.hero-icon-decor {
+      position: absolute; right: 6%; top: 50%; transform: translateY(-50%);
+      font-size: 6rem; color: #fff; opacity: 0.10; pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.4rem 0.9rem; border-radius: 50px; margin-bottom: 0.9rem;
+    }
+    .dash-hero h1 { color: white; font-weight: 800; font-size: 2rem; margin-bottom: 0.4rem; }
+    .dash-hero p { color: rgba(255,255,255,0.9); font-size: 1rem; margin: 0; max-width: 640px; }
+
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 2.4rem 1.5rem 3rem; width: 100%; }
+
+    .alert-flash {
+      border-radius: 1rem; padding: 1rem 1.3rem; margin-bottom: 1.6rem;
+      display: flex; align-items: center; gap: 0.7rem; font-weight: 600; font-size: 0.92rem;
+    }
+    .alert-sucesso { background: #e7f6ed; color: #1e8449; }
+
+    /* ── Cards de módulos ── */
+    .module-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 1.25rem;
+      padding: 1.8rem; height: 100%; cursor: pointer; text-decoration: none; color: inherit;
+      display: block; transition: all 0.25s ease; position: relative; overflow: hidden;
+    }
+    .module-card:hover { transform: translateY(-6px); box-shadow: 0 20px 45px rgba(0,0,0,0.09); border-color: transparent; }
+    .module-card .icon-circle {
+      width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center;
+      justify-content: center; margin-bottom: 1rem; background: rgba(157,4,14,0.08); color: var(--red);
+      font-size: 1.5rem;
+    }
+    .module-card h5 { font-weight: 700; margin-bottom: 0.4rem; font-size: 1.05rem; }
+    .module-card p { color: var(--muted); font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.55; }
+    .module-card .go-link { color: var(--red); font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
+    .module-card .go-link i { transition: transform 0.2s ease; }
+    .module-card:hover .go-link i { transform: translateX(4px); }
+    .module-card.disabled { opacity: 0.55; cursor: not-allowed; }
+    .module-card.disabled:hover { transform: none; box-shadow: none; }
+    .badge-em-breve {
+      position: absolute; top: 1rem; right: 1rem; background: #f3f4f6; color: var(--muted);
+      font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 50px; text-transform: uppercase;
+    }
+
+    .section-title { font-weight: 800; font-size: 1.15rem; margin-bottom: 1.2rem; }
+
+    footer.site-footer {
+      background: var(--bg); border-top: 0.5px solid var(--border);
+      text-align: center; padding: 1.2rem; font-size: 0.78rem; color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      .dash-hero h1 { font-size: 1.5rem; }
+      .module-card { padding: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-premium">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/instituicao/home}">
+      <img th:src="@{/assets/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'"/>
+      <div class="logo-text">
+        <span class="logo-main">Fluxo Vital</span>
+        <span class="logo-sub">Salvando Vidas</span>
+      </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/}"><i class="bi bi-house-door-fill me-1"></i>Início</a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a class="btn-login-premium" th:href="@{/instituicao/logout}">
+            <i class="bi bi-box-arrow-right"></i> Sair
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="dash-hero">
+  <i class="bi bi-building-fill-check hero-icon-decor"></i>
+  <div class="container hero-inner">
+    <div class="hero-badge"><i class="bi bi-building-fill-check"></i> Área da Instituição</div>
+    <h1>Bem-vindo(a), <span th:text="${nome}">Instituição</span></h1>
+    <p>Categoria: <strong th:text="${categoria}" style="color:#fff;">Categoria</strong>. Gerencie seus dados, acompanhe formulários de doadores e organize o fluxo de doações.</p>
+  </div>
+</div>
+
+<main>
+  <div class="page-wrap">
+
+    <div th:if="${sucesso}" class="alert-flash alert-sucesso" role="alert">
+      <i class="bi bi-check-circle-fill"></i>
+      <span th:text="${sucesso}"></span>
+    </div>
+
+    <h2 class="section-title">Gerenciamento</h2>
+    <div class="row g-4 mb-5">
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <a class="module-card" th:href="@{/instituicao/gerenciar}">
+          <div class="icon-circle"><i class="fa-solid fa-building"></i></div>
+          <h5>Dados da Instituição</h5>
+          <p>Adicione e edite informações institucionais, endereço e contato.</p>
+          <span class="go-link">Gerenciar <i class="bi bi-arrow-right"></i></span>
+        </a>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <a class="module-card" th:href="@{/instituicao/doacoes}">
+          <div class="icon-circle"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <h5>Formulários de Doadores</h5>
+          <p>Visualize, valide e convoque os doadores que enviaram formulários.</p>
+          <span class="go-link">Ver formulários <i class="bi bi-arrow-right"></i></span>
+        </a>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="module-card disabled">
+          <span class="badge-em-breve">Em breve</span>
+          <div class="icon-circle"><i class="fa-solid fa-bullhorn"></i></div>
+          <h5>Campanhas</h5>
+          <p>Crie e acompanhe campanhas de doação vinculadas à sua instituição.</p>
+          <span class="go-link" style="color: var(--muted);">Gerenciar <i class="bi bi-arrow-right"></i></span>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="module-card disabled">
+          <span class="badge-em-breve">Em breve</span>
+          <div class="icon-circle"><i class="fa-solid fa-file-lines"></i></div>
+          <h5>Relatórios</h5>
+          <p>Gere relatórios e estatísticas sobre doações e doadores.</p>
+          <span class="go-link" style="color: var(--muted);">Visualizar <i class="bi bi-arrow-right"></i></span>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="module-card disabled">
+          <span class="badge-em-breve">Em breve</span>
+          <div class="icon-circle"><i class="fa-solid fa-truck-medical"></i></div>
+          <h5>Solicitar Coleta</h5>
+          <p>Peça coleta de doações diretamente à equipe Fluxo Vital.</p>
+          <span class="go-link" style="color: var(--muted);">Solicitar <i class="bi bi-arrow-right"></i></span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  &copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> Fluxo Vital. Todos os direitos reservados. &nbsp;|&nbsp; Obrigado por fazer parte dessa corrente do bem.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+</body>
+</html>

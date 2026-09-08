@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Encontrar Instituições - Fluxo Vital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+  <link rel="shortcut icon" th:href="@{/assets/images/logo_fluxovital.png}" type="image/x-icon"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --red:        #9d040e;
+      --red-dark:   #7a030b;
+      --red-bg:     #fdf0f0;
+      --red-border: rgba(157,4,14,0.18);
+      --text:       #1a1a1a;
+      --muted:      #6b7280;
+      --border:     #e5e7eb;
+      --bg:         #ffffff;
+      --surface:    #f9fafb;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar-premium {
+        background: linear-gradient(135deg, #9d040e 0%, #7B1B1B 100%);
+        padding: 1rem 0;
+        box-shadow: 0 10px 40px rgba(157, 4, 14, 0.4);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 4px solid #9d040e;
+    }
+    .navbar-premium .navbar-brand {
+        color: white !important;
+        font-weight: 900;
+        font-size: 1.6rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+    }
+    .navbar-premium .navbar-brand img { height: 50px; width: auto; }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-main { font-size: 1.4rem; font-weight: 800; color: #fff; }
+    .logo-sub  { font-size: 0.7rem; color: #ffccd0; letter-spacing: 0.08em; font-weight: 400; }
+    .btn-login-premium {
+        background: white;
+        color: #c90101 !important;
+        padding: 0.7rem 1.8rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: 3px solid white;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: transform 0.2s ease;
+    }
+    .btn-login-premium:hover { transform: translateY(-2px); }
+    .navbar-toggler { border: 2px solid rgba(255,255,255,0.8); }
+    .navbar-toggler:focus { box-shadow: none; }
+    .navbar-toggler-icon { filter: brightness(0) invert(1); }
+    @media (max-width: 991px) {
+        .navbar-premium .navbar-collapse {
+            background: #7B1B1B; border-radius: 16px; padding: 1rem; margin-top: 0.8rem;
+        }
+        .btn-login-premium { width: 100%; justify-content: center; margin-top: 0.5rem; }
+    }
+
+    /* ── HERO ── */
+    .dash-hero {
+        background: linear-gradient(135deg, var(--red) 0%, #7B1B1B 100%);
+        padding: 2.4rem 0 2.2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .dash-hero i.hero-icon-decor {
+        position: absolute; right: 6%; top: 50%; transform: translateY(-50%);
+        font-size: 6rem; color: #fff; opacity: 0.10; pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+        color: #fff; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+        text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .dash-hero h1 {
+        font-family: 'DM Serif Display', serif; font-size: 2rem; color: #fff;
+        margin-bottom: 6px; line-height: 1.25;
+    }
+    .dash-hero p { font-size: 0.92rem; color: rgba(255,255,255,0.85); max-width: 640px; line-height: 1.6; margin: 0; }
+
+    /* ── CONTEÚDO ── */
+    main { flex: 1; }
+    .page-wrap { max-width: 1080px; margin: 0 auto; padding: 2.2rem 1.5rem 3rem; width: 100%; }
+
+    /* ── FILTROS ── */
+    .filtro-card {
+        background: var(--bg);
+        border: 0.5px solid var(--border);
+        border-radius: 16px;
+        padding: 1.6rem 1.8rem;
+        margin-bottom: 1.8rem;
+    }
+    .filtro-card form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+    .filtro-field { display: flex; flex-direction: column; gap: 5px; flex: 1 1 220px; }
+    .filtro-field label { font-size: 0.78rem; font-weight: 500; color: var(--muted); }
+    .filtro-field select, .filtro-field input {
+        padding: 9px 12px; border: 0.5px solid var(--border); border-radius: 9px;
+        font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text);
+        background: var(--bg); outline: none; transition: border 0.15s;
+    }
+    .filtro-field select:focus, .filtro-field input:focus {
+        border-color: var(--red); box-shadow: 0 0 0 3px rgba(157,4,14,0.08);
+    }
+    .btn-filtrar {
+        background: var(--red); color: #fff; font-weight: 600; font-size: 0.9rem;
+        border-radius: 9px; padding: 10px 22px; border: none; white-space: nowrap;
+        transition: background-color 0.2s ease;
+    }
+    .btn-filtrar:hover { background: var(--red-dark); }
+    .btn-limpar {
+        color: var(--muted); font-size: 0.85rem; text-decoration: none; padding: 10px 6px;
+    }
+    .btn-limpar:hover { color: var(--red); }
+
+    /* ── RESULTADOS ── */
+    .resultado-count { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+    .inst-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+
+    .inst-card {
+        background: var(--bg); border: 0.5px solid var(--border); border-radius: 16px;
+        padding: 1.5rem; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .inst-card:hover { transform: translateY(-3px); box-shadow: 0 1rem 2.2rem rgba(123,30,56,0.10); border-color: transparent; }
+
+    .inst-card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 0.9rem; }
+    .inst-icon-circle {
+        width: 46px; height: 46px; border-radius: 50%; background: var(--red-bg); color: var(--red);
+        display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;
+    }
+    .inst-card h5 { font-weight: 700; color: var(--text); margin: 0 0 3px; font-size: 1rem; }
+    .inst-cat-badge {
+        display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+        text-transform: uppercase; color: var(--red); background: var(--red-bg);
+        padding: 2px 10px; border-radius: 20px;
+    }
+
+    .inst-info { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .inst-info div { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+    .inst-info i { color: var(--red); margin-top: 2px; flex-shrink: 0; }
+
+    .empty-state {
+        background: var(--bg); border: 1px dashed var(--border); border-radius: 16px;
+        padding: 3rem 1.5rem; text-align: center; color: var(--muted);
+    }
+    .empty-state i { font-size: 2.4rem; color: var(--red-border); margin-bottom: 0.8rem; display: block; }
+
+    /* ── FOOTER ── */
+    .site-footer {
+        background: var(--bg); border-top: 0.5px solid var(--border); text-align: center;
+        padding: 1.2rem; font-size: 0.78rem; color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+        .dash-hero h1 { font-size: 1.55rem; }
+        .filtro-card form { flex-direction: column; align-items: stretch; }
+        .btn-filtrar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar navbar-expand-lg navbar-premium">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/doador/home}">
+      <img th:src="@{/assets/images/logo1.png}" alt="Logo Fluxo Vital" onerror="this.style.display='none'"/>
+      <div class="logo-text">
+        <span class="logo-main">Fluxo Vital</span>
+        <span class="logo-sub">Salvando Vidas</span>
+      </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item ms-lg-2">
+          <a class="btn-login-premium" th:href="@{/doador/home}">
+            <i class="bi bi-arrow-left"></i> Voltar
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="dash-hero">
+  <i class="bi bi-geo-alt-fill hero-icon-decor"></i>
+  <div class="container hero-inner">
+    <div class="hero-badge"><i class="bi bi-hospital"></i> Instituições parceiras</div>
+    <h1>Onde você pode doar</h1>
+    <p>Encontre hemocentros, bancos de leite e unidades de coleta de medula parceiras do Fluxo Vital. Filtre por tipo de doação e cidade.</p>
+  </div>
+</div>
+
+<main>
+  <div class="page-wrap">
+
+    <!-- ── FILTROS ── -->
+    <div class="filtro-card">
+      <form th:action="@{/instituicao/buscar}" method="GET">
+        <div class="filtro-field">
+          <label for="tipo">Tipo de instituição</label>
+          <select id="tipo" name="tipo">
+            <option value="">Todos os tipos</option>
+            <option th:each="cat : ${categorias}"
+                    th:value="${cat.name()}"
+                    th:text="${cat.descricao}"
+                    th:selected="${cat.name() == tipoSelecionado}"></option>
+          </select>
+        </div>
+        <div class="filtro-field">
+          <label for="cidade">Cidade</label>
+          <input type="text" id="cidade" name="cidade" placeholder="Ex: São Luís"
+                 th:value="${cidadeBuscada}"/>
+        </div>
+        <button type="submit" class="btn-filtrar"><i class="bi bi-search me-1"></i>Buscar</button>
+        <a th:href="@{/instituicao/buscar}" class="btn-limpar">Limpar filtros</a>
+      </form>
+    </div>
+
+    <!-- ── RESULTADOS ── -->
+    <p class="resultado-count">
+      <span th:text="${resultados != null ? resultados.size() : 0}"></span>
+      instituição(ões) encontrada(s)
+    </p>
+
+    <div th:if="${resultados != null and !resultados.isEmpty()}" class="inst-grid">
+      <div class="inst-card" th:each="inst : ${resultados}">
+        <div class="inst-card-top">
+          <div class="inst-icon-circle"><i class="bi bi-hospital"></i></div>
+          <div>
+            <h5 th:text="${inst.nome}">Nome da instituição</h5>
+            <span class="inst-cat-badge" th:text="${inst.categoria.descricao}">Categoria</span>
+          </div>
+        </div>
+        <div class="inst-info">
+          <div th:if="${inst.endereco != null and !inst.endereco.isEmpty()}">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span th:text="${inst.endereco}">Endereço</span>
+          </div>
+          <div>
+            <i class="bi bi-signpost-2-fill"></i>
+            <span th:text="${inst.cidade + ' - ' + inst.estado}">Cidade - UF</span>
+          </div>
+          <div th:if="${inst.telefone != null and !inst.telefone.isEmpty()}">
+            <i class="bi bi-telephone-fill"></i>
+            <span th:text="${inst.telefone}">Telefone</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:if="${resultados == null or resultados.isEmpty()}" class="empty-state">
+      <i class="bi bi-search"></i>
+      Nenhuma instituição encontrada com esses filtros.<br/>
+      Tente buscar por outra cidade ou remova o filtro de tipo.
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  &copy; 2025 Fluxo Vital. Todos os direitos reservados. &nbsp;|&nbsp; Obrigado por fazer parte dessa corrente do bem.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
